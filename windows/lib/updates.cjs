@@ -8,6 +8,7 @@ const PUBLIC_KEY = 's9DO901wav4VK/hfnLROxJYk4+oNFYvxdOK974E3PgI=';
 const REPOSITORY = 'orkunisitmak/clipboardline-desktop';
 const UPDATE_ARGUMENTS=Object.freeze(['/S','--updated','--force-run']);
 const REFRESH_THROTTLE=60_000;
+// Match the macOS Sparkle cache grace period while preserving the active package.
 const UPDATE_CACHE_RETENTION=10*24*60*60*1000;
 // Offline OCR/semantic models increase the signed installer size. Permit a
 // bounded five-minute socket wait; the authenticated exact byte/PE/hash gates
