@@ -69,7 +69,7 @@ class Updates {
     try{
       this.safeDirectory();const now=this.clock();if(!Number.isFinite(now))return;const cutoff=now-UPDATE_CACHE_RETENTION;
       for(const name of fs.readdirSync(this.directory)){
-        if(!/^ClipBoardLine-Setup-\\d+\\.exe$/.test(name)&&!/^ClipBoardLine-Setup-\\d+\\.exe\\.tmp-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(name))continue;
+        if(!/^ClipBoardLine-Setup-\d+\.exe$/.test(name)&&!/^ClipBoardLine-Setup-\d+\.exe\.tmp-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(name))continue;
         const file=path.join(this.directory,name);if(keepFile&&path.resolve(file)===path.resolve(keepFile))continue;
         try{const stat=fs.lstatSync(file);if(!stat.isFile()||stat.isSymbolicLink()||stat.mtimeMs>=cutoff)continue;fs.unlinkSync(file);}catch{}
       }
