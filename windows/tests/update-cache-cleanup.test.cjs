@@ -38,5 +38,7 @@ test('a verified installer download prunes stale generated installers and temp f
  assert.equal(fs.existsSync(staleInstaller),false);assert.equal(fs.existsSync(staleTemporary),false);
  assert.equal(fs.existsSync(recentInstaller),true);assert.equal(fs.existsSync(futureInstaller),true);
  const staleAfterDownload=path.join(directory,'ClipBoardLine-Setup-57.exe');fs.writeFileSync(staleAfterDownload,bytes);fs.utimesSync(staleAfterDownload,stale/1000,stale/1000);
- assert.equal(await updates.download(),latest);assert.equal(fs.existsSync(staleAfterDownload),false);
+ fs.utimesSync(latest,stale/1000,stale/1000);
+ assert.equal(await updates.download(),latest);assert.equal(fs.existsSync(latest),true);assert.equal(fs.existsSync(staleAfterDownload),false);
 });
+
