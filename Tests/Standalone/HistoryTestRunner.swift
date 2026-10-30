@@ -518,6 +518,7 @@ enum HistoryTestRunner {
             ("testEditingSearchResultKeepsDraftUntilDoneAndArrowsUseRemainingResults", requestedUX.testEditingSearchResultKeepsDraftUntilDoneAndArrowsUseRemainingResults),
             ("testNativeSearchEscapeRoutesImmediateSelectAllToCollectionAndLeavesOtherEditorsAlone", libraryInteraction.testNativeSearchEscapeRoutesImmediateSelectAllToCollectionAndLeavesOtherEditorsAlone),
             ("testPagedTagSummariesRefreshAfterRenameAndRemovalWithoutChangingSelection", libraryInteraction.testPagedTagSummariesRefreshAfterRenameAndRemovalWithoutChangingSelection),
+            ("testTextCopiedWithWindowsLineEndingsIsTitledByItsFirstLine", libraryInteraction.testTextCopiedWithWindowsLineEndingsIsTitledByItsFirstLine),
             ("testMigrationPreservesTextBytesDatesFavoritesIDsAndOriginals", libraryStore.testMigrationPreservesTextBytesDatesFavoritesIDsAndOriginals),
             ("testCorruptSourceBlocksMigrationAndDoesNotOverwriteArchive", libraryStore.testCorruptSourceBlocksMigrationAndDoesNotOverwriteArchive),
             ("testFolderTagOrFavoriteRetainsAcrossUnassignUnpinAndExpiry", libraryStore.testFolderTagOrFavoriteRetainsAcrossUnassignUnpinAndExpiry),
