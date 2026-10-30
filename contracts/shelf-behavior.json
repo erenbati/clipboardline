@@ -64,6 +64,12 @@
         "behavior": "Restoring items from Library Trash moves focus and selection to the first item that remains in Trash, and clears the details panel when none remain, so the panel never shows Restore for an item that already left Trash.",
         "macos": "LibraryModel.restore() queues a keyboard selection that finishKeyboardSelection resolves to the first remaining item after the reload; LibraryInteractionTests.testRestoringFromTrashSelectsTheFirstRemainingItemLikeWindows covers it.",
         "windows": "The restore action calls reconcileLibraryFocus() and renders, which keeps a surviving focus or falls back to the first remaining item; library-ui.test.cjs covers it."
+      },
+      {
+        "id": "item-display-title",
+        "behavior": "An item without a name is titled by its content: a text by its first line with surrounding spaces and tabs removed and at most 120 characters, a link by its fetched page title or else its host name, so an indented snippet or a long copied URL reads the same on both platforms.",
+        "macos": "LibraryRecord.displayTitle returns the trimmed first line capped at 120 characters for a text and the metadata title or the URL host for a link; LibraryInteractionTests.testUnnamedItemTitlesAreTheTrimmedFirstLineAndLinkHostLikeWindows covers it.",
+        "windows": "title() in renderer.js applies the same rule to cards, title sorting and best-match ranking; library-ui.test.cjs runs the unnamed item titles scenario."
       }
     ]
   },

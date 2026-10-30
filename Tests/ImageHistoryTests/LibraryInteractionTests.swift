@@ -209,6 +209,12 @@ import XCTest
         model.changeScope(.collection(middle)); wait { model.query.scope == .collection(middle) && !model.loading }
         XCTAssertEqual(model.title, "Parent / Middle")
     }
+    func testUnnamedItemTitlesAreTheTrimmedFirstLineAndLinkHostLikeWindows() throws {
+        let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
+        let indented = try XCTUnwrap(store.captureText("\t  Indented first line \nsecond line")), long = try XCTUnwrap(store.captureText(String(repeating: "x", count: 130)))
+        let link = try store.captureLink(URL(string: "https://www.example.com/a/very/long/path?utm_source=news")!)
+        XCTAssertEqual(indented.displayTitle, "Indented first line"); XCTAssertEqual(long.displayTitle, String(repeating: "x", count: 120)); XCTAssertEqual(link.displayTitle, "www.example.com")
+    }
     func testRestoringFromTrashSelectsTheFirstRemainingItemLikeWindows() throws {
         let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
         let records = try ["first trashed note", "second trashed note", "third trashed note"].map { try XCTUnwrap(store.captureText($0)) }
