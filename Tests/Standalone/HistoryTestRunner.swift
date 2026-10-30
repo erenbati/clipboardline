@@ -307,6 +307,7 @@ enum HistoryTestRunner {
             ("testCatalogReflectsRemappedDisabledAndContextSpecificShortcutHints", actionBarCatalog.testCatalogReflectsRemappedDisabledAndContextSpecificShortcutHints),
             ("testCatalogKeepsNativeMarkupShortcutHintsAndAvailabilityInMarkupContext", actionBarCatalog.testCatalogKeepsNativeMarkupShortcutHintsAndAvailabilityInMarkupContext),
             ("testCatalogShelfLibraryTrashAndUpdateAvailabilityDoNotBleedAcrossContexts", actionBarCatalog.testCatalogShelfLibraryTrashAndUpdateAvailabilityDoNotBleedAcrossContexts),
+            ("testCopyStaysAvailableForTrashedItemsWhileEditingActionsDoNot", actionBarCatalog.testCopyStaysAvailableForTrashedItemsWhileEditingActionsDoNot),
             ("testCatalogFolderTagCommandsUseStableIDsAndCurrentScope", actionBarCatalog.testCatalogFolderTagCommandsUseStableIDsAndCurrentScope),
             ("testCatalogBilingualKeywordsAreExplicitAndNeverIncludeOpaqueIdentifiers", actionBarCatalog.testCatalogBilingualKeywordsAreExplicitAndNeverIncludeOpaqueIdentifiers),
             ("testCatalogActiveStatesFollowCurrentShelfAndLibraryFilters", actionBarCatalog.testCatalogActiveStatesFollowCurrentShelfAndLibraryFilters),
