@@ -64,6 +64,9 @@ this on both platforms with an image, a text and a link selected.
 `trash-restore-selection` requires restoring items from Library Trash to move
 focus and selection to the first item that remains in Trash and to clear the
 details panel when none remain.
+`trash-copy` requires the Copy action to stay enabled for an item in Library
+Trash, as the copy shortcut already works there, while editing actions wait for
+Restore.
 `folder-removal-view` requires removing a folder to return the Library to My
 library only when the open view is that folder or one of its subfolders.
 

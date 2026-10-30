@@ -772,3 +772,10 @@ test('Settings shortcut filter matches the displayed localized action titles as 
  await f.input('shortcut-filter','Sabitle');assert.ok(rows().includes('pin'));assert.ok(!rows().includes('copy'));
  await f.input('shortcut-filter','copy');assert.ok(rows().includes('copy'));
 });
+test('the Move to Trash confirmation uses the shared localized catalog entry',async()=>{
+ const f=fixture();await f.ready();await keyboardSaved(f);
+ f.api.emit({settings:{...f.state.settings,language:'tr'}});await f.ready();await f.click('trash');
+ assert.match(f.overlay,/1 içerik geri alınabilir Çöp’e taşınsın mı\?/);
+ f.api.emit({settings:{...f.state.settings,language:'en'}});await f.click('close-modal');await f.click('trash');
+ assert.match(f.overlay,/Move 1 items to recoverable Trash\?/);
+});
