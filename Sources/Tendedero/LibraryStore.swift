@@ -49,7 +49,8 @@ struct LibraryRecord: Codable, Equatable, Identifiable {
         let name = title.trimmingCharacters(in: .whitespacesAndNewlines)
         if !name.isEmpty { return name }
         if kind == .link, let metadataTitle, !metadataTitle.isEmpty { return metadataTitle }
-        if let text { return String(text.split(separator: "\n", omittingEmptySubsequences: false).first ?? "").trimmingCharacters(in: .whitespaces).prefix(120).description }
+        // "\r\n" is one Character in Swift, so it is matched on its own.
+        if let text { return String(text.split(omittingEmptySubsequences: false, whereSeparator: { $0 == "\n" || $0 == "\r\n" }).first ?? "").trimmingCharacters(in: .whitespaces).prefix(120).description }
         if let path { return URL(fileURLWithPath: originalPath ?? path).deletingPathExtension().lastPathComponent }
         return URL(string: originalURL ?? "")?.host ?? L("Link")
     }
