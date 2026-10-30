@@ -146,7 +146,7 @@ enum Inbox {
         UserDefaults.standard.set(saved, forKey: savedKey)
 
         for (name, key) in preferences {
-            set(key, InboxSettings.keys.contains(name) ? managedValue(for: name) : nil)
+            set(key, managedValue(for: name))
         }
     }
 
