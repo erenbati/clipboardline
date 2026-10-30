@@ -270,6 +270,7 @@ public static class ClipBoardLineNative {
   }
   public static void EmitCurrentFocus() { try { EmitFocus(FocusSnapshot()); } catch(Exception) {} }
   public static void EmitSequence(uint sequence) { lock(outputLock) { Console.Out.WriteLine("{\"sequence\":"+sequence+"}");Console.Out.Flush(); } }
+  public static void EmitReady() { lock(outputLock) { Console.Out.WriteLine("{\"ready\":true}");Console.Out.Flush(); } }
   public static void ObserveSequenceQueries() {
     var reader=new System.Threading.Thread(delegate() {
       try {
@@ -349,6 +350,7 @@ try {
     [ClipBoardLineNative]::ObserveFocus()
     # The clipboard present at launch is never reported, even when its sequence is 0; only later changes are.
     $last = [ClipBoardLineNative]::GetClipboardSequenceNumber()
+    [ClipBoardLineNative]::EmitReady()
     while ($true) {
       $sequence = [ClipBoardLineNative]::GetClipboardSequenceNumber()
       if ($sequence -ne $last) { [ClipBoardLineNative]::EmitSequence($sequence); $last=$sequence }

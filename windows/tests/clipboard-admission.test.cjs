@@ -82,11 +82,10 @@ test('a standalone URL is ordinary exact text while link capture is off, as on m
 });
 test('the native monitor never reports the clipboard already present at launch, so the first real copy is captured',{skip:process.platform!=='win32',timeout:60000},async()=>{
  // Read-only: the monitor only polls GetClipboardSequenceNumber. Whatever the launch sequence is (0 included), no report may arrive until it changes.
- const native=require('../lib/native.cjs'),reports=[],child=native.monitor(sequence=>reports.push(sequence),()=>{});
- try{
-  const launch=await native.clipboardSequence();await new Promise(r=>setTimeout(r,1500));
-  if(await native.clipboardSequence()===launch)assert.deepEqual(reports,[]);
- }finally{child.kill();}
+ // The monitor signals readiness after it has read the launch sequence, so the wait does not depend on PowerShell start-up time.
+ const native=require('../lib/native.cjs'),reports=[];let ready;const started=new Promise(resolve=>{ready=resolve;});
+ const child=native.monitor(sequence=>reports.push(sequence),()=>{},()=>{},ready);
+ try{await started;await new Promise(r=>setTimeout(r,1500));assert.deepEqual(reports,[]);}finally{child.kill();}
 });
 test('an identical later copy is a new generation, so a deleted or hidden item is captured again',async()=>{
  const state={sequence:0},first=board([{'text/plain':'same synthetic text'}]),second=board([{'text/plain':'same synthetic text'}]);second.advance();
