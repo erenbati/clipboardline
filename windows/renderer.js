@@ -427,7 +427,7 @@ function dialog(titleText,body,footer='',className='') {return `<div class="moda
 let shortcutRecorderSerial=0;
 function releaseShortcutRecording(modal){if(modal?.type==='record'&&modal.recordingToken)void command('endShortcutRecording',{token:modal.recordingToken});}
 function openModal(value) {
- const previous=ui.modal;ui.modal=value;
+ const previous=ui.modal;value.returnFocus=previous?.returnFocus||document.activeElement;ui.modal=value;
  if(value.type==='record'){
   value.recordingToken=Date.now()+':'+(++shortcutRecorderSerial)+':'+Math.random().toString(36).slice(2);value.recordingReady=false;
   try{renderOverlay();}catch(error){ui.modal=null;releaseShortcutRecording(previous);releaseShortcutRecording(value);throw error;}
@@ -439,7 +439,7 @@ function openModal(value) {
  }
  releaseShortcutRecording(previous);renderOverlay();(overlays.querySelector('input,textarea,button.dialog-option')||overlays.querySelector('[data-action="confirm-modal"]')||overlays.querySelector('button:not([disabled])'))?.focus();
 }
-function closeModal(expected=ui.modal){if(ui.modal!==expected)return false;const previous=ui.modal;ui.modal=null;releaseShortcutRecording(previous);if(ui.view==='library'&&!ui.preview){reconcileLibraryFocus();render();focusLibraryResults();}else renderOverlay();return true;}
+function closeModal(expected=ui.modal){if(ui.modal!==expected)return false;const previous=ui.modal,returnFocus=previous?.returnFocus;ui.modal=null;releaseShortcutRecording(previous);if(ui.view==='library'&&!ui.preview){reconcileLibraryFocus();render();focusLibraryResults();}else{renderOverlay();if(returnFocus&&returnFocus.isConnected!==false)returnFocus.focus({preventScroll:true});}return true;}
 function currentModalOptions(){
  const modal=ui.modal;if(!modal)return[];
  if(modal.type==='actions')return actionCommands().filter(value=>matchesCommand(value,modal.query||''));
