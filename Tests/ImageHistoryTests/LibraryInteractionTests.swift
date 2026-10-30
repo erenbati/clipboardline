@@ -214,6 +214,8 @@ import XCTest
         let indented = try XCTUnwrap(store.captureText("\t  Indented first line \nsecond line")), long = try XCTUnwrap(store.captureText(String(repeating: "x", count: 130)))
         let link = try store.captureLink(URL(string: "https://www.example.com/a/very/long/path?utm_source=news")!)
         XCTAssertEqual(indented.displayTitle, "Indented first line"); XCTAssertEqual(long.displayTitle, String(repeating: "x", count: 120)); XCTAssertEqual(link.displayTitle, "www.example.com")
+        let blankFirst = try XCTUnwrap(store.captureText("\n \t\nSecond line\nthird"))
+        XCTAssertEqual(blankFirst.displayTitle, "Second line")
     }
     func testRestoringFromTrashSelectsTheFirstRemainingItemLikeWindows() throws {
         let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
