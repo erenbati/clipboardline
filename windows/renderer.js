@@ -677,7 +677,7 @@ case 'remove':if(ui.view==='library')await trashLibrarySelection(ids);else await
 case 'undoTrash':await undoLibraryTrash();break;
 case 'focusNextPane':await cycleLibraryPane(1);break;case 'focusPreviousPane':await cycleLibraryPane(-1);break;
 case 'newNote':if(await flushPreview())await perform('new-note');break;case 'newFolder':if(await flushPreview())await perform('new-folder');break;
-case 'trash':case 'delete':if(ids.length)openModal({type:'confirm',title:action==='delete'?'Delete permanently':'Move to Trash',label:action==='delete'?'Delete permanently':'Move to Trash',message:action==='delete'?`Permanently remove ${ids.length} records? This cannot be undone.`:`Move ${ids.length} selected records to recoverable Library Trash?`,command:action,payload:{ids}});break;
+case 'trash':case 'delete':if(ids.length)openModal({type:'confirm',title:action==='delete'?'Delete permanently':'Move to Trash',label:action==='delete'?'Delete permanently':'Move to Trash',message:action==='delete'?`Permanently remove ${ids.length} records? This cannot be undone.`:t('Move %d items to recoverable Trash?').replace('%d',String(ids.length)),command:action,payload:{ids}});break;
 case 'restore':if(ids.length){const restored=await command('restore',{ids});if(restored&&ui.view==='library'&&ui.scope==='trash'){reconcileLibraryFocus();render();}}break;
 case 'export':if(ids.length)await command('export',{ids});break;
 case 'open':if(value?.kind==='link')await command('openLink',{id:value.id});break;
