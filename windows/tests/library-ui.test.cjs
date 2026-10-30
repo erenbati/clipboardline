@@ -65,7 +65,7 @@ function fixture({deferInitialState=false,initialVisible=true}={}){
  const context={window:{clipboardLine:api,addEventListener(){}},document,HTMLElement:Element,HTMLTextAreaElement:TextArea,Image:FixtureImage,console,structuredClone,URL,Set,Date,JSON,Math,Number,String,requestAnimationFrame:fn=>fn(),setTimeout:fn=>{queueMicrotask(fn);return 1;},clearTimeout(){}};
  vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(__dirname,'../renderer.js'),'utf8'),context,{filename:'renderer.js'});
  async function ready(){await new Promise(setImmediate);}
- async function key(code,{ctrl=false,alt=false,shift=false,key,target}={}){const event={code,key:key||(/^Key/.test(code)?code.slice(3).toLowerCase():code==='Space'?' ':code),ctrlKey:ctrl,metaKey:false,altKey:alt,shiftKey:shift,repeat:false,target:target||new Element(),preventDefault(){this.prevented=true;}};for(const listener of listeners.get('keydown')||[])await listener(event);await ready();return event;}
+ async function key(code,{ctrl=false,alt=false,shift=false,repeat=false,key,target}={}){const event={code,key:key||(/^Key/.test(code)?code.slice(3).toLowerCase():code==='Space'?' ':code),ctrlKey:ctrl,metaKey:false,altKey:alt,shiftKey:shift,repeat,target:target||new Element(),preventDefault(){this.prevented=true;}};for(const listener of listeners.get('keydown')||[])await listener(event);await ready();return event;}
  async function click(action,extra={}){const target=new Element();target.dataset.action=action;Object.assign(target.dataset,extra);target.closest=selector=>selector==='[data-action]'?target:null;for(const listener of listeners.get('click')||[])listener({target,stopPropagation(){}});await ready();}
  async function pointer(type,x,y){const target=document.getElementById('markup-canvas');for(const listener of listeners.get(type)||[])listener({target,clientX:x,clientY:y,pointerId:1,shiftKey:false,preventDefault(){}});await ready();}
  function columnGrip(column){const target=new Element();target.dataset.listColumn=column;target.closest=selector=>selector==='[data-list-column]'?target:null;return target;}
@@ -337,6 +337,21 @@ test('a background state push keeps keyboard focus on the focused dialog button 
  // An unmatchable selector (for example a stored tag with a control character) must not stop the refresh.
  const again=buttons.filter(button=>button.dataset.action==='close-modal');again[1].focus();overlay.querySelectorAll=()=>{throw new SyntaxError('invalid selector');};
  f.api.emit({});await f.ready();assert.ok(overlay.innerHTML.includes('close-modal'),'the overlay is still rebuilt');
+});
+test('Space on a focused dialog button activates it on keydown, so a background refresh between keydown and keyup cannot drop the click',async()=>{
+ const f=fixture();await f.ready();await f.key('KeyF');
+ // Chromium clicks a button on Space keyup only if the same element saw the keydown; a state push rebuilds the overlay in between.
+ const overlay=f.nodes.get('overlay-root'),buttons=[];
+ Object.defineProperty(overlay,'innerHTML',{configurable:true,get(){return this._html||'';},set(html){
+  this._html=html;buttons.length=0;
+  for(const [, attributes] of html.matchAll(/<button([^>]*)>/g)){const action=attributes.match(/ data-action="([^"]*)"/)?.[1];if(!action)continue;const button={id:'',dataset:{action},clicks:0,closest:selector=>selector==='button'?button:null,focus(){f.document.activeElement=button;},click(){button.clicks++;void f.click(action);}};buttons.push(button);}
+ }});
+ overlay.contains=node=>buttons.includes(node);overlay.querySelectorAll=()=>[];overlay.querySelector=()=>null;
+ await f.click('new-note');
+ const cancel=buttons.filter(button=>button.dataset.action==='close-modal')[1];cancel.focus();
+ const enter=await f.key('Enter',{target:cancel});assert.equal(enter.prevented,undefined,'Enter keeps its native activation');assert.equal(cancel.clicks,0);assert.ok(overlay.innerHTML.includes('close-modal'));
+ const repeat=await f.key('Space',{target:cancel,repeat:true});assert.equal(cancel.clicks,0,'a held key does not repeat the click');assert.equal(repeat.prevented,true);
+ const space=await f.key('Space',{target:cancel});assert.equal(space.prevented,true,'the native keyup click is suppressed so it cannot fire twice');assert.equal(cancel.clicks,1);assert.ok(!overlay.innerHTML.includes('close-modal'),'Cancel closed the dialog on keydown');
 });
 test('Library Last copied falls back to the creation time, so editing a never-copied item does not reorder it',async()=>{
  const f=fixture();await f.ready();f.state.items[1].lastCopiedAt=950;f.state.items[2].updatedAt=5000;f.api.emit({items:f.state.items});await f.ready();await recent(f);

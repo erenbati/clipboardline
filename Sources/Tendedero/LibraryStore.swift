@@ -730,9 +730,11 @@ extension String {
         changed([id]); return value
     }
     func toggleFavorite(_ ids: [UUID]) throws { try mutate(ids) { $0.favorite.toggle(); if $0.favorite && $0.retainedAt == nil { $0.retainedAt = self.now() } } }
-    private func mutate(_ ids: [UUID], _ transform: (inout LibraryRecord) throws -> Void) throws {
+    /// `owning` makes a retained image's file private again. Leaving the shelf, Trash and restore only change
+    /// visibility, so they must not fail when a managed copy was deleted outside the app.
+    private func mutate(_ ids: [UUID], owning: Bool = true, _ transform: (inout LibraryRecord) throws -> Void) throws {
         var values = try ids.map { id -> LibraryRecord in guard let value = try item(id) else { throw HistoryFiles.Failure.unsafeFile }; return value }
-        for index in values.indices { try transform(&values[index]); values[index].updatedAt = now(); if values[index].retainedAt != nil { try ensureOwned(&values[index]) } }
+        for index in values.indices { try transform(&values[index]); values[index].updatedAt = now(); if owning, values[index].retainedAt != nil { try ensureOwned(&values[index]) } }
         try db.transaction { for value in values { try put(value) } }
         invalidateTrashUndo(ids); changed(ids)
     }
@@ -740,7 +742,7 @@ extension String {
         let values = try records(Array(Set(ids))).filter { $0.onShelf && $0.deletedAt == nil }
         guard !values.isEmpty else { return }
         let date = now()
-        try mutate(values.map(\.id)) { $0.onShelf = false; if $0.retainedAt == nil { $0.deletedAt = date; $0.trashRevision = UUID() } }
+        try mutate(values.map(\.id), owning: false) { $0.onShelf = false; if $0.retainedAt == nil { $0.deletedAt = date; $0.trashRevision = UUID() } }
         shelfRemovalUndo.append(values.map { ShelfRemoval(id: $0.id, removedAt: $0.retainedAt == nil ? date : nil) })
         if shelfRemovalUndo.count > 32 { shelfRemovalUndo.removeFirst() }
     }
@@ -754,7 +756,7 @@ extension String {
             }
             guard !values.isEmpty else { shelfRemovalUndo.removeLast(); continue }
             let ids = values.map(\.id)
-            try mutate(ids) { $0.onShelf = true; $0.deletedAt = nil; $0.trashRevision = nil }
+            try mutate(ids, owning: false) { $0.onShelf = true; $0.deletedAt = nil; $0.trashRevision = nil }
             shelfRemovalUndo.removeLast(); return ids
         }
         return []
@@ -763,7 +765,7 @@ extension String {
         let affected = Set(ids)
         shelfRemovalUndo = shelfRemovalUndo.map { $0.filter { !affected.contains($0.id) } }.filter { !$0.isEmpty }
     }
-    func trash(_ ids: [UUID]) throws { try mutate(ids) { $0.deletedAt = self.now(); $0.onShelf = false; $0.trashRevision = UUID() }; invalidateShelfUndo(ids) }
+    func trash(_ ids: [UUID]) throws { try mutate(ids, owning: false) { $0.deletedAt = self.now(); $0.onShelf = false; $0.trashRevision = UUID() }; invalidateShelfUndo(ids) }
     /// Library user actions have a separate, bounded undo history. Keep only
     /// visibility and a digest of the exact committed trash generation; never
     /// retain a second megabyte-sized text or a copy of image bytes in RAM.
@@ -884,7 +886,7 @@ extension String {
         invalidateShelfUndo(eligible); invalidateTrashUndo(eligible); changed(eligible)
         return eligible
     }
-    func restore(_ ids: [UUID]) throws { try mutate(ids) { $0.deletedAt = nil; $0.onShelf = true; $0.trashRevision = nil }; invalidateShelfUndo(ids) }
+    func restore(_ ids: [UUID]) throws { try mutate(ids, owning: false) { $0.deletedAt = nil; $0.onShelf = true; $0.trashRevision = nil }; invalidateShelfUndo(ids) }
     func markCopied(_ ids: [UUID]) throws { try mutate(ids) { $0.lastCopiedAt = self.now(); $0.captureRevision = UUID() } }
     func prune() throws {
         var expired = [LibraryRecord]()

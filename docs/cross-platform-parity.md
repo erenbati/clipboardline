@@ -51,6 +51,10 @@ renderer test that runs the shipped export through the Export shortcut.
 details panel to show the count with the localized `%d selected` entry. The
 Windows folder picker uses the same entry; the macOS folder picker keeps its own
 `Pin %d items to a folder` heading.
+`link-title-charset` requires a fetched page title to be decoded with the page's
+declared character set (byte-order mark, `Content-Type`, XHTML declaration, early
+`<meta charset>`), falling back to windows-1252, so windows-1254 pages show their
+Turkish letters.
 
 The adapters execute application behavior:
 

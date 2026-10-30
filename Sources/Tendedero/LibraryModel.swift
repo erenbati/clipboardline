@@ -240,6 +240,9 @@ import Combine
             let folders = try store.collections(), labels = try store.tags()
             if collections != folders { collections = folders }
             if tags != labels { tags = labels }
+            // A removed tag would stay as a filter with no chip, hiding every item.
+            let live = Set(labels.map(\.id))
+            if !query.tagIDs.isSubset(of: live) { query.tagIDs.formIntersection(live) }
         } catch { notice = error.localizedDescription }
         store.resolveImageSearch(query) { [weak self] resolved in
           guard let self, generation == self.queryGeneration else { return }

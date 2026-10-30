@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),path=require('node:path'),fs=require('node:fs');
-const {privateClipboard,readClipboardContent}=require('../lib/clipboard-policy.cjs');
+const {privateClipboard,readClipboardContent,repeatedGeneration}=require('../lib/clipboard-policy.cjs');
 const {ClipboardSequenceQueries,afterCurrent}=require('../lib/clipboard-sequence.cjs');
 const contract=JSON.parse(fs.readFileSync(path.join(__dirname,'../../contracts/clipboard-admission.json'),'utf8'));
 const marker=Buffer.from('synthetic-own-marker');
@@ -82,4 +82,9 @@ test('a standalone URL is ordinary exact text while link capture is off, as on m
 });
 test('the clipboard already present at launch is not captured, only later copies',()=>{
  const seen=[],notify=afterCurrent(sequence=>seen.push(sequence));notify(41);assert.deepEqual(seen,[]);notify(42);notify(43);assert.deepEqual(seen,[42,43]);
+});
+test('an identical later copy is a new generation, so a deleted or hidden item is captured again',async()=>{
+ const state={sequence:0},first=board([{'text/plain':'same synthetic text'}]),second=board([{'text/plain':'same synthetic text'}]);second.advance();
+ const a=await read(first),b=await read(second);assert.equal(a.fingerprint,b.fingerprint);assert.notEqual(a.sequence,b.sequence);
+ assert.equal(repeatedGeneration(state,a),false);assert.equal(repeatedGeneration(state,a),true);assert.equal(repeatedGeneration(state,b),false);
 });

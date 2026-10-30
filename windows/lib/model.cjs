@@ -281,12 +281,12 @@ class Store {
         if(referenced)for(const filename of [assets.videoFile,assets.posterFile])if(MANAGED_MEDIA.test(filename)&&!referenced.has(filename))try{fs.unlinkSync(path.join(this.mediaDirectory,filename));}catch{}
         throw error;
       }
-      const before=clone(this.data),now=this.clock();
+      const before=clone(this.data),live=this.liveItems(),now=this.clock();
       try{
         const item=prior||{id:crypto.randomUUID(),kind:'image',recording:true,text:'',url:'',title:'',name:'',pinned:false,folderIds:[],tags:[],note:'',retainedAt:null,lastCopiedAt:null,createdAt:now,updatedAt:now,trashedAt:null,hiddenFromShelf:false,annotations:[],crop:null,ocrText:'',imageFile:assets.posterFile,renderedFile:'',videoFile:assets.videoFile,renderedVideoFile:'',...assets.details};
         item.createdAt=now;item.updatedAt=now;item.hiddenFromShelf=false;item.captureRevision=crypto.randomUUID();
         this.data.items=[item,...this.data.items.filter(entry=>entry.id!==item.id)];this.expire(false);this.persist();return item;
-      }catch(error){this.data=before;throw error;}
+      }catch(error){this.rollback(before,live);throw error;}
     }finally{this.releaseInFlightMedia(assets.inFlightMediaFiles);}
   }
   async commitRecordingTrim(value){
@@ -295,7 +295,7 @@ class Store {
     try{
       const item=this.item(value.id);if(!item.recording||item.trashedAt||(item.renderedVideoFile||item.videoFile).slice(0,64)!==value.sourceFingerprint)fail('The recording changed while trimming');
       if(value.signal?.aborted)fail('Video operation canceled');
-      const before=clone(this.data);try{Object.assign(item,assets.details,{renderedVideoFile:assets.videoFile,renderedFile:assets.posterFile,updatedAt:this.clock()});this.persist();return item;}catch(error){this.data=before;throw error;}
+      const before=clone(this.data),live=this.liveItems();try{Object.assign(item,assets.details,{renderedVideoFile:assets.videoFile,renderedFile:assets.posterFile,updatedAt:this.clock()});this.persist();return item;}catch(error){this.rollback(before,live);throw error;}
     }finally{this.releaseInFlightMedia(assets.inFlightMediaFiles);}
   }
   insert(kind, value, extra = {}) {
@@ -345,9 +345,13 @@ class Store {
     }
     if (persist && changed) this.persist();
   }
+  liveItems(){return [...this.data.items];}
+  // Restore in place: OCR and link-preview jobs hold item objects across awaits and drop their result once store.data.items no longer includes them.
+  // The snapshot and the live list were taken together, so match by position: each live object is reused at most once, even if a corrupt library repeats an id.
+  rollback(before,live){before.items=before.items.map((saved,index)=>{const item=live[index];if(!item||item.id!==saved.id)return saved;for(const key of Object.keys(item))delete item[key];return Object.assign(item,saved);});this.data=before;}
   modify(action, payload = {}) {
-    const before=clone(this.data), undo=clone(this.undoStack), trashUndo=clone(this.trashUndoStack);
-    try{return this.modifyTransaction(action,payload);}catch(error){if(!error.committed){this.data=before;this.undoStack=undo;this.trashUndoStack=trashUndo;}throw error;}
+    const before=clone(this.data), live=this.liveItems(), undo=clone(this.undoStack), trashUndo=clone(this.trashUndoStack);
+    try{return this.modifyTransaction(action,payload);}catch(error){if(!error.committed){this.rollback(before,live);this.undoStack=undo;this.trashUndoStack=trashUndo;}throw error;}
   }
   modifyTransaction(action, payload = {}) {
     const now = this.clock();

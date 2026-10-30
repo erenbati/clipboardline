@@ -47,6 +47,18 @@ import XCTest
         XCTAssertEqual(model.selectedIDs, [tagged.id])
         XCTAssertEqual(try store.item(tagged.id)?.text, tagged.text)
     }
+    func testRemovingATagAlsoDropsItsLibraryFilterSoItemsStayVisible() throws {
+        let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
+        let note = try XCTUnwrap(store.captureText("tagged note")); try store.retain([note.id]); try store.addTag("Work", to: [note.id])
+        let tag = try XCTUnwrap(store.tags().first)
+        let model = LibraryModel(store: store)
+        wait { model.ids == [note.id] && !model.loading }
+        model.toggleTagFilter(tag.id); wait { model.query.tagIDs == [tag.id] && !model.loading }
+        XCTAssertEqual(model.ids, [note.id])
+        try store.removeTag(tag.id)
+        wait { model.query.tagIDs.isEmpty && !model.loading }
+        XCTAssertEqual(model.ids, [note.id])
+    }
     func testNativeSearchEscapeRoutesImmediateSelectAllToCollectionAndLeavesOtherEditorsAlone() throws {
         _ = NSApplication.shared
         let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
