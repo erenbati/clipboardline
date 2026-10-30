@@ -496,3 +496,9 @@
 "Focus previous pane" = "Önceki bölmeye odaklan";
 
 "Undo Move to Trash" = "Çöp’e taşımayı geri al";
+
+/* Image markup errors. */
+"The image markup document is invalid." = "Görsel işaretleme belgesi geçersiz.";
+"This image could not be opened for markup." = "Bu görsel işaretleme için açılamadı.";
+"Markup supports images up to 80 megapixels." = "İşaretleme en fazla 80 megapiksellik görselleri destekler.";
+"The marked image could not be rendered." = "İşaretlenen görsel oluşturulamadı.";

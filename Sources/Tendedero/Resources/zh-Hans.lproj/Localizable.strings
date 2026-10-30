@@ -496,3 +496,9 @@
 "Focus previous pane" = "聚焦上一个面板";
 
 "Undo Move to Trash" = "撤销移到废纸篓";
+
+/* Image markup errors. */
+"The image markup document is invalid." = "图像标记文档无效。";
+"This image could not be opened for markup." = "无法打开此图像进行标记。";
+"Markup supports images up to 80 megapixels." = "标记功能支持最高 8000 万像素的图像。";
+"The marked image could not be rendered." = "无法渲染已标记的图像。";

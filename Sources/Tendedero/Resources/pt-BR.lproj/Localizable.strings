@@ -496,3 +496,9 @@
 "Focus previous pane" = "Focar painel anterior";
 
 "Undo Move to Trash" = "Desfazer mover para o Lixo";
+
+/* Image markup errors. */
+"The image markup document is invalid." = "O documento de marcação da imagem é inválido.";
+"This image could not be opened for markup." = "Não foi possível abrir esta imagem para marcação.";
+"Markup supports images up to 80 megapixels." = "A marcação oferece suporte a imagens de até 80 megapixels.";
+"The marked image could not be rendered." = "Não foi possível renderizar a imagem marcada.";
