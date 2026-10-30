@@ -64,6 +64,8 @@ this on both platforms with an image, a text and a link selected.
 `trash-restore-selection` requires restoring items from Library Trash to move
 focus and selection to the first item that remains in Trash and to clear the
 details panel when none remain.
+`folder-removal-view` requires removing a folder to return the Library to My
+library only when the open view is that folder or one of its subfolders.
 
 The adapters execute application behavior:
 

@@ -420,6 +420,14 @@ import Combine
         perform { try store.assign(actionIDs, to: folder, movingFrom: source) }
     }
     func addTag(_ name: String) { guard flushEdits() else { return }; perform { try store.addTag(name, to: actionIDs) } }
+    /// Remove a folder with its subfolders. Only a view of that subtree falls back to My library, as on Windows.
+    func removeFolder(_ id: UUID) {
+        guard flushEdits() else { return }
+        let removed = Set(((try? store.collections()) ?? collections).filter { $0.id == id || $0.parentID == id }.map(\.id))
+        var done = false
+        perform { try store.removeCollection(id); done = true }
+        if done, case let .collection(current) = query.scope, removed.contains(current) { changeScope(.saved) }
+    }
     func unassign(_ folder: UUID) { guard flushEdits(), let id = inspected?.id else { return }; perform { try store.unassign(id, from: folder) } }
     func removeTag(_ tag: UUID) { guard flushEdits(), let id = inspected?.id else { return }; perform { try store.removeTag(tag, from: id) } }
     func open() { guard let id = focusedID, let record = try? store.item(id), let url = record.linkURL ?? record.fileURL else { return }; NSWorkspace.shared.open(url) }
