@@ -45,7 +45,7 @@ final class InboxSettingsTests: XCTestCase {
 
         XCTAssertEqual(
             InboxSettings.userChangedKeys(current: current, folder: folder),
-            ["locationScreenshot", "targetScreenshot"]
+            ["locationScreenshot"]
         )
     }
 }
