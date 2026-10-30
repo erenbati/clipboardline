@@ -47,6 +47,22 @@ import XCTest
         XCTAssertEqual(model.selectedIDs, [tagged.id])
         XCTAssertEqual(try store.item(tagged.id)?.text, tagged.text)
     }
+    func testPinningAMixedLibrarySelectionPinsEveryItemAndOnlyAFullyPinnedSelectionUnpins() throws {
+        let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
+        let ids = try (0..<3).map { index -> UUID in let record = try XCTUnwrap(store.captureText("pin note \(index)")); try store.retain([record.id]); return record.id }
+        try store.toggleFavorite([ids[0]])
+        let retainedAt = try store.records(ids).map(\.retainedAt)
+        f.date = f.date.addingTimeInterval(1)
+        let model = LibraryModel(store: store)
+        wait { model.ids.count == 3 && !model.loading }
+        model.selectAll(); model.favorite()
+        XCTAssertEqual(try store.records(ids).map(\.favorite), [true, true, true])
+        XCTAssertEqual(try store.records(ids).map(\.retainedAt), retainedAt)
+        f.date = f.date.addingTimeInterval(1)
+        model.favorite()
+        XCTAssertEqual(try store.records(ids).map(\.favorite), [false, false, false])
+        XCTAssertEqual(try store.records(ids).map(\.retainedAt), retainedAt)
+    }
     func testRemovingATagAlsoDropsItsLibraryFilterSoItemsStayVisible() throws {
         let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
         let note = try XCTUnwrap(store.captureText("tagged note")); try store.retain([note.id]); try store.addTag("Work", to: [note.id])

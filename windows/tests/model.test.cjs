@@ -167,3 +167,8 @@ test('selection lookups keep request order and reject missing items',()=>fixture
  assert.throws(()=>s.selected([first.id,'00000000-0000-4000-8000-000000000000']),/no longer exists/);
  s.modify('trash',{ids:[first.id]});s.modify('delete',{ids:[first.id]});assert.deepEqual(s.data.items.map(item=>item.id),[second.id]);
 }));
+test('pin on a mixed selection pins every item and only a fully pinned selection unpins like macOS',()=>fixture(s=>{
+ const a=s.insert('text','first pin'),b=s.insert('text','second pin'),pinned=()=>[a,b].map(value=>s.item(value.id).pinned);
+ s.modify('pin',{ids:[a.id]});s.modify('pin',{ids:[a.id,b.id]});assert.deepEqual(pinned(),[true,true]);
+ s.modify('pin',{ids:[a.id,b.id]});assert.deepEqual(pinned(),[false,false]);
+}));

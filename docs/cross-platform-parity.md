@@ -55,6 +55,10 @@ Windows folder picker uses the same entry; the macOS folder picker keeps its own
 declared character set (byte-order mark, `Content-Type`, XHTML declaration, early
 `<meta charset>`), falling back to windows-1252, so windows-1254 pages show their
 Turkish letters.
+`mixed-selection-pin` requires Pin on a
+selection of pinned and unpinned items to pin all of them, and to unpin only
+when every selected item is already pinned; the Library keyboard contract executes
+this on both platforms with an image, a text and a link selected.
 
 The adapters execute application behavior:
 
@@ -148,7 +152,7 @@ with that exact counterpart; both feeds must say 1.7.6 before Latest promotion.
 
 Mac build78 and Windows build71 implement the same Library keyboard workflow.
 See [the bilingual guide](library-keyboard.md). The additive
-`contracts/library-keyboard.json` specifies 10 scenarios / 87 observations through the
+`contracts/library-keyboard.json` specifies 11 scenarios / 92 observations through the
 shipping Mac Model/Store and Windows renderer/Store. This contract proves state,
 not physical focus; native Mac focus/workflow tests, Cua acceptance and Windows
 source/packaged/installed keyboard journeys separately verify controls, panes,

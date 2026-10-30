@@ -58,3 +58,18 @@ test('an exception during OS suspension restores every previously released owned
  f.shortcuts.registry.unregister=key=>{if(++calls===2)throw new Error('Synthetic OS unregister failure');original(key);};
  assert.throws(()=>f.shortcuts.suspend(),/unregister failure/);assert.equal(f.shortcuts.suspended,false);assert.equal(f.callbacks.size,2);assert.equal(f.callbacks.has('Control+Alt+T'),true);assert.equal(f.callbacks.has('Control+Alt+S'),true);for(const callback of f.callbacks.values())callback();assert.deepEqual(f.fired.sort(),['search','toggle']);
 });
+
+
+test('reassigning a released shortcut in the same update does not spuriously conflict',async()=>{
+ const f=fixture();
+ assert.deepEqual(f.shortcuts.update({toggle:'Control+Alt+T',search:'Control+Alt+S'}),[]);
+ const old=[...f.callbacks.values()];
+ assert.deepEqual(f.shortcuts.update({toggle:'Control+Alt+S',search:''}),[]);
+ assert.deepEqual([...f.shortcuts.registered],[['toggle','Control+Alt+S']]);
+ assert.deepEqual([...f.callbacks.keys()],['Control+Alt+S']);
+ for(const callback of old)callback();
+ await Promise.resolve();
+ assert.deepEqual(f.fired,[]);
+ f.callbacks.get('Control+Alt+S')();await Promise.resolve();
+ assert.deepEqual(f.fired,['toggle']);
+});

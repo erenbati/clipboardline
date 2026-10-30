@@ -188,7 +188,7 @@ class Store {
   }
   preparePermanentDeletion(){
     if(fs.lstatSync(this.mediaDirectory).isSymbolicLink())fail('Managed media must not be a symlink.');
-    const referenced=this.mediaReferences(),files=fs.readdirSync(this.mediaDirectory).filter(name=>MANAGED_MEDIA.test(name)&&!referenced.has(name));
+    const referenced=this.mediaReferences();for(const filename of this.inFlightMediaReferences.keys())referenced.add(filename);const files=fs.readdirSync(this.mediaDirectory).filter(name=>MANAGED_MEDIA.test(name)&&!referenced.has(name));
     this.data.pendingDeletionFiles=[...new Set([...(this.data.pendingDeletionFiles||[]),...files])];
     this.data.pendingBackupRefresh=true;
   }
@@ -207,7 +207,7 @@ class Store {
       // records cannot survive in that older snapshot or be resurrected from it.
       this.refreshPrivateBackup();
       if(fs.lstatSync(this.mediaDirectory).isSymbolicLink())throw new Error('Managed media directory changed.');
-      const referenced=this.mediaReferences();
+      const referenced=this.mediaReferences();for(const filename of this.inFlightMediaReferences.keys())referenced.add(filename);
       for(const name of pending){if(!MANAGED_MEDIA.test(name))throw new Error('Invalid managed filename.');if(referenced.has(name))continue;try{fs.unlinkSync(path.join(this.mediaDirectory,name));}catch(error){if(error.code!=='ENOENT')throw error;}}
       this.data.pendingDeletionFiles=[];this.data.pendingBackupRefresh=false;
       try{this.persist();}catch(error){this.data.pendingDeletionFiles=pending;this.data.pendingBackupRefresh=true;throw error;}

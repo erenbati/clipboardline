@@ -729,7 +729,12 @@ extension String {
         }
         changed([id]); return value
     }
-    func toggleFavorite(_ ids: [UUID]) throws { try mutate(ids) { $0.favorite.toggle(); if $0.favorite && $0.retainedAt == nil { $0.retainedAt = self.now() } } }
+    /// A mixed selection pins every item, as on Windows and as the action bar's
+    /// Unpin title assumes; only a selection that is already fully pinned unpins.
+    func toggleFavorite(_ ids: [UUID]) throws {
+        let pin = try records(ids).contains { !$0.favorite }
+        try mutate(ids) { $0.favorite = pin; if pin && $0.retainedAt == nil { $0.retainedAt = self.now() } }
+    }
     /// `owning` makes a retained image's file private again. Leaving the shelf, Trash and restore only change
     /// visibility, so they must not fail when a managed copy was deleted outside the app.
     private func mutate(_ ids: [UUID], owning: Bool = true, _ transform: (inout LibraryRecord) throws -> Void) throws {

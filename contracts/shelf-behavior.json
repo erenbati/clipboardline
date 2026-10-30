@@ -46,6 +46,12 @@
         "behavior": "A fetched page title and Open Graph text are decoded with the page's declared character set, in this order: UTF-8 byte-order mark, Content-Type charset, XML declaration (XHTML only), early meta charset; unknown labels are skipped, a meta UTF-16 label means UTF-8, and undeclared bytes that are not UTF-8 are windows-1252, so older windows-1254 / ISO-8859-9 pages show their Turkish letters.",
         "macos": "PublicLinkHTMLMetadata.decode follows that order with CoreFoundation IANA names; PublicLinkNetworkTests.testHTMLHonorsDeclaredMetaCharsetAndFallsBackToWindows1252 covers it.",
         "windows": "decodeHTML in lib/network.cjs follows that order with TextDecoder; security.test.cjs covers it."
+      },
+      {
+        "id": "mixed-selection-pin",
+        "behavior": "Pin on a selection that contains both pinned and unpinned items pins every item; only a selection that is already fully pinned unpins.",
+        "macos": "LibraryStore.toggleFavorite and Line.pinActiveSelection compute one target for the whole selection, matching the action bar, which offers Unpin only when every selected item is pinned; LibraryKeyboardContractTests runs the library-pin-on-a-mixed-selection-pins-all-then-unpins-all scenario of contracts/library-keyboard.json.",
+        "windows": "Store.modify('pin') pins every selected item when any is unpinned (targetPin); model.test.cjs covers a mixed selection and renderer-ui.test.cjs runs the library-pin-on-a-mixed-selection-pins-all-then-unpins-all scenario of contracts/library-keyboard.json."
       }
     ]
   },
