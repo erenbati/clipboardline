@@ -541,6 +541,7 @@ enum HistoryTestRunner {
             ("testLibraryKeyboardGridRangesAllResultsFiltersAndEditingStayDistinct", libraryInteraction.testLibraryKeyboardGridRangesAllResultsFiltersAndEditingStayDistinct),
             ("testRapidQueriesCannotOverwriteLatestSearchAndRetainFocusOnMetadataChange", libraryInteraction.testRapidQueriesCannotOverwriteLatestSearchAndRetainFocusOnMetadataChange),
             ("testRemovingLastVisibleItemClearsInspectorAndFiltersRecoverSameScope", libraryInteraction.testRemovingLastVisibleItemClearsInspectorAndFiltersRecoverSameScope),
+            ("testRestoringFromTrashSelectsTheFirstRemainingItemLikeWindows", libraryInteraction.testRestoringFromTrashSelectsTheFirstRemainingItemLikeWindows),
             ("testInspectorEditsPersistAndFailedSaveKeepsDraftAndSelection", libraryInteraction.testInspectorEditsPersistAndFailedSaveKeepsDraftAndSelection),
             ("testMixedTransferExportAndDragPreserveRepresentationsOrderAndOriginals", libraryInteraction.testMixedTransferExportAndDragPreserveRepresentationsOrderAndOriginals),
             ("testYouTubeParserIgnoresHTMLAndRejectsMalformedOrUntrustedImages", libraryInteraction.testYouTubeParserIgnoresHTMLAndRejectsMalformedOrUntrustedImages),

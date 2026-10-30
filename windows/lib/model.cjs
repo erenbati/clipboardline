@@ -223,6 +223,12 @@ class Store {
   }
   invalidateTrashUndo(value){const affected=new Set(value);this.trashUndoStack=this.trashUndoStack.map(batch=>batch.filter(entry=>!affected.has(entry.id))).filter(batch=>batch.length);}
   markCopied(value){this.modify('markCopied',{ids:value});}
+  // Applies fetched preview metadata only while the link is still live, so a link removed during the fetch gets no stored thumbnail.
+  setLinkMetadata(item,url,{title,author,thumbnail}){
+    if(!this.data.items.includes(item)||item.trashedAt||item.url!==url)return false;
+    let thumbnailFile='';if(thumbnail)try{thumbnailFile=this.putPNG(thumbnail);}catch{}
+    item.title=title||new URL(url).hostname;item.author=author||'';if(thumbnailFile)item.thumbnailFile=thumbnailFile;this.persist();return true;
+  }
   putPNG(buffer) {
     if (!Buffer.isBuffer(buffer) || buffer.length < 24 || buffer.length > 64 * 1024 * 1024 || buffer.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') fail('Invalid PNG image');
     const width = buffer.readUInt32BE(16), height = buffer.readUInt32BE(20);

@@ -198,10 +198,10 @@ async function enrich(id,{refresh=false}={}) {
     if(refresh){delete item.thumbnailFile;delete item.author;item.title=new URL(url).hostname;store.persist();broadcast();}
     const metadata=await linkMetadata(url);
     if(!current()||!store.data.items.includes(item)||item.trashedAt||item.url!==url)return;
-    let thumbnailFile='';
-    if(metadata.thumbnail){try{const response=await metadataFetch(metadata.thumbnail,{maximum:2*1024*1024});const image=nativeImage.createFromBuffer(response.bytes);if(!image.isEmpty()){const size=image.getSize();if(size.width*size.height<=16_000_000)thumbnailFile=store.putPNG(image.resize({width:Math.min(size.width,640)}).toPNG());}}catch{}}
+    let thumbnail=null;
+    if(metadata.thumbnail){try{const response=await metadataFetch(metadata.thumbnail,{maximum:2*1024*1024});const image=nativeImage.createFromBuffer(response.bytes);if(!image.isEmpty()){const size=image.getSize();if(size.width*size.height<=16_000_000)thumbnail=image.resize({width:Math.min(size.width,640)}).toPNG();}}catch{}}
     if(!current()||!store.data.items.includes(item)||item.trashedAt||item.url!==url)return;
-    item.title=metadata.title||new URL(url).hostname;item.author=metadata.author||'';if(thumbnailFile)item.thumbnailFile=thumbnailFile;store.persist();broadcast();
+    if(store.setLinkMetadata(item,url,{title:metadata.title,author:metadata.author,thumbnail}))broadcast();
   }catch(error){if(refresh&&current())throw new Error('Link preview could not be refreshed: '+error.message);}
   finally{if(pending.get(id)===generation)pending.delete(id);}
 }

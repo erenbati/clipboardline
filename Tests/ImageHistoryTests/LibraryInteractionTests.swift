@@ -195,6 +195,24 @@ import XCTest
         _ = model.select(record.id); model.trash(); wait { model.ids.isEmpty && !model.loading }
         XCTAssertNil(model.inspected); XCTAssertTrue(model.selectedIDs.isEmpty)
     }
+    func testRestoringFromTrashSelectsTheFirstRemainingItemLikeWindows() throws {
+        let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
+        let records = try ["first trashed note", "second trashed note", "third trashed note"].map { try XCTUnwrap(store.captureText($0)) }
+        try store.trash(records.map(\.id))
+        let model = LibraryModel(store: store); model.changeScope(.trash)
+        wait { model.ids.count == 3 && !model.loading }
+        let order = model.ids
+        _ = model.select(order[1]); model.restore()
+        wait { model.ids.count == 2 && !model.loading }
+        XCTAssertEqual(model.ids, [order[0], order[2]])
+        XCTAssertEqual(model.focusedID, order[0]); XCTAssertEqual(model.selectedIDs, [order[0]]); XCTAssertEqual(model.inspected?.id, order[0])
+        model.restore()
+        wait { model.ids.count == 1 && !model.loading }
+        XCTAssertEqual(model.focusedID, order[2]); XCTAssertEqual(model.selectedIDs, [order[2]])
+        model.restore()
+        wait { model.ids.isEmpty && !model.loading }
+        XCTAssertNil(model.focusedID); XCTAssertNil(model.inspected); XCTAssertTrue(model.selectedIDs.isEmpty)
+    }
     func testInspectorEditsPersistAndFailedSaveKeepsDraftAndSelection() throws {
         let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
         let a = try XCTUnwrap(store.captureText("first")), b = try XCTUnwrap(store.captureText("second")); try store.retain([a.id,b.id])
