@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),path=require('node:path'),fs=require('node:fs');
 const {privateClipboard,readClipboardContent,repeatedGeneration}=require('../lib/clipboard-policy.cjs');
-const {ClipboardSequenceQueries,afterCurrent}=require('../lib/clipboard-sequence.cjs');
+const {ClipboardSequenceQueries}=require('../lib/clipboard-sequence.cjs');
 const contract=JSON.parse(fs.readFileSync(path.join(__dirname,'../../contracts/clipboard-admission.json'),'utf8'));
 const marker=Buffer.from('synthetic-own-marker');
 const {plainURL}=require('../lib/model.cjs');
@@ -80,8 +80,13 @@ test('a standalone URL is ordinary exact text while link capture is off, as on m
  const on=await read(board([{'text/plain':url}]));assert.deepEqual([on.kind,on.value],['link','https://example.com/a?b=1']);
  const off=await readClipboardContent({...board([{'text/plain':url}]),marker,plainURL,captureLinks:false});assert.deepEqual([off.kind,off.value],['text',url]);
 });
-test('the clipboard already present at launch is not captured, only later copies',()=>{
- const seen=[],notify=afterCurrent(sequence=>seen.push(sequence));notify(41);assert.deepEqual(seen,[]);notify(42);notify(43);assert.deepEqual(seen,[42,43]);
+test('the native monitor never reports the clipboard already present at launch, so the first real copy is captured',{skip:process.platform!=='win32',timeout:60000},async()=>{
+ // Read-only: the monitor only polls GetClipboardSequenceNumber. Whatever the launch sequence is (0 included), no report may arrive until it changes.
+ const native=require('../lib/native.cjs'),reports=[],child=native.monitor(sequence=>reports.push(sequence),()=>{});
+ try{
+  const launch=await native.clipboardSequence();await new Promise(r=>setTimeout(r,1500));
+  if(await native.clipboardSequence()===launch)assert.deepEqual(reports,[]);
+ }finally{child.kill();}
 });
 test('an identical later copy is a new generation, so a deleted or hidden item is captured again',async()=>{
  const state={sequence:0},first=board([{'text/plain':'same synthetic text'}]),second=board([{'text/plain':'same synthetic text'}]);second.advance();
