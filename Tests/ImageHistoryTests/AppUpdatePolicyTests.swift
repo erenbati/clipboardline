@@ -96,4 +96,26 @@ final class AppUpdatePolicyTests: HistoryTestCase {
         }
         XCTAssertTrue(rejects { _ = try repo.releaseAssetURL(id: 0) })
     }
+
+    func testUpdateErrorMessagesAreTranslatedInEveryCatalog() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let resources = root.appendingPathComponent("Sources/Tendedero/Resources")
+        let folders = try FileManager.default.contentsOfDirectory(atPath: resources.path).filter { $0.hasSuffix(".lproj") }
+        XCTAssertGreaterThan(folders.count, 1)
+        let policy: [AppUpdatePolicyError] = [.invalidRepository, .invalidRelease, .invalidEnvelope, .invalidSignature, .invalidManifest, .wrongRepository, .nonIncreasingBuild, .oversizedArchive]
+        let installer = ["The update has no application information.", "The update belongs to another application.", "The update executable is invalid.",
+                         "The update staging directory is not private.", "The update is missing a supported architecture.", "The application signature is missing.",
+                         "The application signature is invalid.", "The signing certificate could not be read.", "An ad-hoc or unrelated application cannot install updates.",
+                         "The application identity is missing.", "The application identity could not be read.", "The application identity is empty.",
+                         "The installed build is invalid.", "The downloaded version does not match the release.", "This update needs a newer version of macOS.",
+                         "The update changed the trusted application identity.", "The update is not signed by the installed application's publisher.",
+                         "The installed architectures have different signing identities.", "The update download is incomplete.", "The update download failed its integrity check.",
+                         "The update staging directory is already in use.", "The update archive could not be opened.", "The installed application path is unsafe.",
+                         "Move the app to a writable Applications folder before updating.", "The update installer is missing."]
+        let messages = try policy.map { try XCTUnwrap($0.errorDescription) } + installer
+        for folder in folders {
+            let table = try XCTUnwrap(NSDictionary(contentsOf: resources.appendingPathComponent(folder).appendingPathComponent("Localizable.strings")) as? [String: String])
+            for message in messages { XCTAssertNotNil(table[message], "\(folder) has no entry for \(message)") }
+        }
+    }
 }
