@@ -21,7 +21,7 @@ async function main(){
   await page.evaluate(()=>window.clipboardLine.command('library'));
   await page.evaluate(()=>{const r=window.__shelfPerformance.renderer;r.ui.filtersOpen=true;r.ui.filterTags=[];r.render();});
   const activeTag=()=>page.evaluate(()=>document.activeElement?.dataset?.filterTag||null),tagFilter=tag=>page.locator('.filter-tags input[data-filter-tag="'+tag+'"]');
-  await tagFilter('native-tab-a').focus();await page.keyboard.press('Space');
+  await page.locator('#domain-filter').focus();await page.keyboard.press('Tab');assert.equal(await activeTag(),'native-tab-a','Tab reaches tag A');await page.keyboard.press('Space');
   assert.equal(await activeTag(),'native-tab-a','Space keeps focus on tag A after filtering rerenders');
   assert.equal(await tagFilter('native-tab-a').isChecked(),true);
   const singleTagResults=await page.locator('.library-grid > .card').evaluateAll(nodes=>nodes.map(node=>node.dataset.itemId));
