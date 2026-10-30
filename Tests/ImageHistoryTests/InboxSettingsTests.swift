@@ -13,7 +13,7 @@ final class InboxSettingsTests: XCTestCase {
         XCTAssertFalse(InboxSettings.isApplied(current: current, folder: folder))
     }
 
-    func testRestoreLeavesScreenshotDestinationChangedInOptions() {
+    func testRestoreLeavesSettingsChangedInOptions() {
         let folder = URL(fileURLWithPath: "/tmp/clipboardline-inbox")
         let current: [String: Any] = [
             "location": folder.path,
@@ -21,13 +21,13 @@ final class InboxSettingsTests: XCTestCase {
             "locationRecording": folder.path,
             "thumbnail": false,
             "target": "file",
-            "targetScreenshot": "file",
+            "targetScreenshot": "clipboard",
             "targetRecording": "file"
         ]
 
         XCTAssertEqual(
             InboxSettings.restorableKeys(current: current, folder: folder),
-            ["location", "locationRecording", "thumbnail", "target", "targetScreenshot", "targetRecording"]
+            ["location", "locationRecording", "thumbnail", "target", "targetRecording"]
         )
     }
 
@@ -45,7 +45,7 @@ final class InboxSettingsTests: XCTestCase {
 
         XCTAssertEqual(
             InboxSettings.userChangedKeys(current: current, folder: folder),
-            ["locationScreenshot"]
+            ["locationScreenshot", "targetScreenshot"]
         )
     }
 }
