@@ -8,6 +8,19 @@ import XCTest
 @MainActor final class ImageMarkupTests: HistoryTestCase {
     private var temporary: [URL] = []
 
+    func testMarkupErrorMessagesAreTranslatedInEveryCatalog() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let resources = root.appendingPathComponent("Sources/Tendedero/Resources")
+        let folders = try FileManager.default.contentsOfDirectory(atPath: resources.path).filter { $0.hasSuffix(".lproj") }
+        XCTAssertGreaterThan(folders.count, 1)
+        for error in [ImageMarkupError.invalidDocument, .unreadableImage, .imageTooLarge, .renderFailed] {
+            let message = try XCTUnwrap(error.errorDescription)
+            for folder in folders {
+                let table = try XCTUnwrap(NSDictionary(contentsOf: resources.appendingPathComponent(folder).appendingPathComponent("Localizable.strings")) as? [String: String])
+                XCTAssertNotNil(table[message], "\(folder) has no entry for \(message)")
+            }
+        }
+    }
     private func cleanup() {
         for url in temporary { try? FileManager.default.removeItem(at: url) }
         temporary = []
