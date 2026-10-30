@@ -51,7 +51,7 @@ struct LibraryRecord: Codable, Equatable, Identifiable {
         if let text {
             // The first line with visible content, as on Windows; "\r\n" is one Character in Swift.
             let lines = text.split(omittingEmptySubsequences: false, whereSeparator: { $0 == "\n" || $0 == "\r\n" })
-            return String((lines.lazy.map { $0.trimmingCharacters(in: .whitespaces) }.first { !$0.isEmpty } ?? "").prefix(120))
+            return lines.lazy.map { $0.trimmingCharacters(in: .whitespaces) }.first { !$0.isEmpty }.map { String($0.prefix(120)) } ?? L("Untitled note")
         }
         if let path { return URL(fileURLWithPath: originalPath ?? path).deletingPathExtension().lastPathComponent }
         return URL(string: originalURL ?? "")?.host ?? L("Link")
