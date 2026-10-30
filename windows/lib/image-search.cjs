@@ -49,7 +49,16 @@ class ImageSearch{
      if(indexed&&!this.current(job.id,job.key))await this.request('prune',{keys:[...new Set(this.items().map(value=>this.key(value)).filter(Boolean))]});
      if(indexed&&this.current(job.id,job.key)){this.known.add(job.key);this.state.revision++;delete this.state.error;this.changed({...this.state});}
     }catch{if(this.current(job.id,job.key))this.failed.add(job.key);}
-    finally{this.active=null;this.updateStatus();}
+    finally{
+     this.active=null;
+     // If the record owning this shared fingerprint vanished mid-job, keep
+     // indexing the same image through a surviving record rather than stalling.
+     if(!this.current(job.id,job.key)&&!this.known.has(job.key)&&!this.failed.has(job.key)&&!this.queue.some(value=>value.key===job.key)){
+      const replacement=this.items().find(value=>this.key(value)===job.key);
+      if(replacement)this.queue.push({id:replacement.id,key:job.key});
+     }
+     this.updateStatus();
+    }
    }
   }finally{this.draining=false;this.active=null;this.updateStatus();}
  }
