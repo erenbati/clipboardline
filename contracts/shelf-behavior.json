@@ -67,8 +67,8 @@
       },
       {
         "id": "item-display-title",
-        "behavior": "An item without a name is titled by its content: a text by its first line with surrounding spaces and tabs removed and at most 120 characters, a link by its fetched page title or else its host name, so an indented snippet or a long copied URL reads the same on both platforms.",
-        "macos": "LibraryRecord.displayTitle returns the trimmed first line capped at 120 characters for a text and the metadata title or the URL host for a link; LibraryInteractionTests.testUnnamedItemTitlesAreTheTrimmedFirstLineAndLinkHostLikeWindows covers it.",
+        "behavior": "An item without a name is titled by its content: a text by its first line that is not blank, with surrounding spaces and tabs removed and at most 120 characters (lines end at LF or CRLF), a link by its fetched page title or else its host name, so an indented snippet or a long copied URL reads the same on both platforms.",
+        "macos": "LibraryRecord.displayTitle returns the first non-blank line, trimmed and capped at 120 characters, for a text and the metadata title or the URL host for a link; LibraryInteractionTests.testUnnamedItemTitlesAreTheTrimmedFirstLineAndLinkHostLikeWindows covers it.",
         "windows": "title() in renderer.js applies the same rule to cards, title sorting and best-match ranking; library-ui.test.cjs runs the unnamed item titles scenario."
       }
     ]

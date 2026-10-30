@@ -64,8 +64,8 @@ this on both platforms with an image, a text and a link selected.
 `trash-restore-selection` requires restoring items from Library Trash to move
 focus and selection to the first item that remains in Trash and to clear the
 details panel when none remain.
-`item-display-title` requires an unnamed text to be titled by its first line,
-trimmed and capped at 120 characters, and a link without a fetched title by its
+`item-display-title` requires an unnamed text to be titled by its first non-blank
+line, trimmed and capped at 120 characters, and a link without a fetched title by its
 host name.
 
 The adapters execute application behavior:

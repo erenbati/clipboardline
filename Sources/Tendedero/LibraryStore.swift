@@ -48,7 +48,11 @@ struct LibraryRecord: Codable, Equatable, Identifiable {
     var displayTitle: String {
         if !title.isEmpty { return title }
         if kind == .link, let metadataTitle, !metadataTitle.isEmpty { return metadataTitle }
-        if let text { return String(text.split(separator: "\n", omittingEmptySubsequences: false).first ?? "").trimmingCharacters(in: .whitespaces).prefix(120).description }
+        if let text {
+            // The first line with visible content, as on Windows; "\r\n" is one Character in Swift.
+            let lines = text.split(omittingEmptySubsequences: false, whereSeparator: { $0 == "\n" || $0 == "\r\n" })
+            return String((lines.lazy.map { $0.trimmingCharacters(in: .whitespaces) }.first { !$0.isEmpty } ?? "").prefix(120))
+        }
         if let path { return URL(fileURLWithPath: originalPath ?? path).deletingPathExtension().lastPathComponent }
         return URL(string: originalURL ?? "")?.host ?? L("Link")
     }
