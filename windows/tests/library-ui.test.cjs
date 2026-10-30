@@ -168,7 +168,11 @@ test('restoring the only Trash item clears its stale inspector selection',async(
 
 test('Library tags are listed in folded-name order like the Mac library',async()=>{
  const f=fixture();await f.ready();Object.assign(f.state.items[0],{retainedAt:1000,tags:['zebra','Çay']});Object.assign(f.state.items[1],{retainedAt:900,tags:['apple','Banana']});f.api.emit({items:f.state.items});await f.ready();await savedLibrary(f);
- assert.deepEqual([...f.main.matchAll(/data-action="tag-scope" data-tag="([^"]+)"/g)].map(match=>match[1]),['apple','Banana','Çay','zebra']);
+ const expected=['apple','Banana','Çay','zebra'],order=(html,pattern)=>[...html.matchAll(pattern)].map(match=>match[1]);
+ assert.deepEqual(order(f.main,/data-action="tag-scope" data-tag="([^"]+)"/g),expected,'sidebar');
+ await f.click('toggle-filters');assert.deepEqual(order(f.main,/data-filter-tag="([^"]+)"/g),expected,'Library tag filter');
+ await f.key('KeyT',{ctrl:true,shift:true});assert.deepEqual(order(f.overlay,/data-action="pick-tag" data-tag="([^"]+)"/g),expected,'Add tags dialog');await f.key('Escape');
+ await f.key('KeyK',{ctrl:true});assert.deepEqual(order(f.overlay,/Open tag · ([^<"]+)/g),expected,'command palette');
 });
 test('global tag menu keyboard rename follows the selected scope and filters while deletion requires confirmation',async()=>{
  const f=fixture();await f.ready();Object.assign(f.state.items[0],{retainedAt:1000,tags:['client'],pinned:true});Object.assign(f.state.items[1],{retainedAt:900,tags:['client'],pinned:false});Object.assign(f.state.items[2],{retainedAt:800,tags:['other']});f.api.emit({items:f.state.items});await f.ready();await savedLibrary(f);await f.click('tag-scope',{tag:'client'});await f.change('filter-client','',{dataset:{filterTag:'client'},checked:true});assert.deepEqual(cards(f),[f.image,f.text1]);await f.click('tag-menu',{tag:'client'});assert.match(f.overlay,/Rename tag/);assert.match(f.overlay,/Remove tag/);await f.key('Enter');assert.match(f.overlay,/Rename tag/);await f.input('simple-input','Renamed client');await f.key('Enter');assert.deepEqual(f.commands.findLast(command=>command.action==='renameTag').payload,{tag:'client',name:'Renamed client'});assert.deepEqual(cards(f),[f.image,f.text1]);assert.match(f.main,/data-action="tag-scope" data-tag="Renamed client" class="active"/);assert.deepEqual(f.state.items[0].tags,['Renamed client']);assert.deepEqual(f.state.items[1].tags,['Renamed client']);assert.equal(f.state.items[1].pinned,false);
