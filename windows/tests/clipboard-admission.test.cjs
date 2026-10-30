@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),path=require('node:path'),fs=require('node:fs');
 const {privateClipboard,readClipboardContent}=require('../lib/clipboard-policy.cjs');
-const {ClipboardSequenceQueries}=require('../lib/clipboard-sequence.cjs');
+const {ClipboardSequenceQueries,afterCurrent}=require('../lib/clipboard-sequence.cjs');
 const contract=JSON.parse(fs.readFileSync(path.join(__dirname,'../../contracts/clipboard-admission.json'),'utf8'));
 const marker=Buffer.from('synthetic-own-marker');
 const {plainURL}=require('../lib/model.cjs');
@@ -79,4 +79,7 @@ test('a standalone URL is ordinary exact text while link capture is off, as on m
  const url=' https://example.com/a?b=1\r\n';
  const on=await read(board([{'text/plain':url}]));assert.deepEqual([on.kind,on.value],['link','https://example.com/a?b=1']);
  const off=await readClipboardContent({...board([{'text/plain':url}]),marker,plainURL,captureLinks:false});assert.deepEqual([off.kind,off.value],['text',url]);
+});
+test('the clipboard already present at launch is not captured, only later copies',()=>{
+ const seen=[],notify=afterCurrent(sequence=>seen.push(sequence));notify(41);assert.deepEqual(seen,[]);notify(42);notify(43);assert.deepEqual(seen,[42,43]);
 });
