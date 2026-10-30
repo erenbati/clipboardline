@@ -27,6 +27,10 @@ test('search ignores character width like the Mac library (full-width Latin, hal
  const compat={...structuredClone(f.initial.items[1]),id:'71000000-0000-4000-8000-000000000002',createdAt:5001,text:'ﬁnance ①'};f.emit([compat,wide,...f.raw.items]);
  for(const query of ['finance','1']){api.ui.search=query;assert.ok(!plain(api.rowItems('text')).includes(compat.id),query);}
  api.ui.search='ﬁnance ①';assert.ok(plain(api.rowItems('text')).includes(compat.id));
+ // One width step only, like the Mac: half-width ﾡ is the compatibility jamo ㄱ, and ￣ is ¯ (NFKC would turn it into a space that matches everything).
+ const jamo={...structuredClone(f.initial.items[1]),id:'71000000-0000-4000-8000-000000000003',createdAt:5002,text:'ﾡ ￣'};f.emit([jamo,compat,wide,...f.raw.items]);
+ for(const query of ['ㄱ','ﾡ','¯','￣']){api.ui.search=query;assert.ok(plain(api.rowItems('text')).includes(jamo.id),query);}
+ api.ui.search='￣';assert.ok(!plain(api.rowItems('text')).includes(wide.id));
 });
 test('hide, Trash, restored kind and visible-shelf changes never retain prior row contents or duplicate selection',async()=>{
  const f=fixture();await f.ready();const {api}=f;f.emit(f.raw.items.map(value=>value.id===f.initial.items[0].id?{...value,hiddenFromShelf:true}:value.id===f.initial.items[1].id?{...value,trashedAt:2}:value.id===f.initial.items[5].id?{...value,hiddenFromShelf:false}:value));assert.deepEqual(plain(api.rowItems('image')),[f.initial.items[5].id]);assert.deepEqual(plain(api.rowItems('text')),[f.initial.items[4].id,f.initial.items[2].id]);
