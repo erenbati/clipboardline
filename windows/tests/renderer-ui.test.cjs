@@ -15,7 +15,7 @@ function fixture({deferInitialState=false,initialVisible=true,queuedAnimationFra
  const listeners=new Map(),nodes=new Map(),commands=[],imageLoads=[],animationFrames=[],paintCalls=[];let exportFailures=0,lastClick=null,testDocument;
  class Element{
   constructor(id=''){this.id=id;this._innerHTML='';this.textContent='';this.dataset={};this.style={};this.className='';this.value='';this.selectionStart=0;this.selectionEnd=0;this.isConnected=true;this.classList={add(){},remove(){},contains(){return false;}};}
-  get innerHTML(){return this._innerHTML;}set innerHTML(value){if(trackFocus&&this.id==='overlay-root'&&testDocument?.activeElement?.insideOverlay){testDocument.activeElement.isConnected=false;testDocument.activeElement=testDocument.body;}this._innerHTML=value;}
+  get innerHTML(){return this._innerHTML;}set innerHTML(value){if(trackFocus&&this.id==='app'&&lastClick)lastClick.isConnected=false;if(trackFocus&&this.id==='overlay-root'&&testDocument?.activeElement?.insideOverlay){testDocument.activeElement.isConnected=false;testDocument.activeElement=testDocument.body;}this._innerHTML=value;}
   setAttribute(){}querySelector(){if(trackFocus&&this.id==='overlay-root'&&this.innerHTML){const target=new Element();target.insideOverlay=true;return target;}return null;}querySelectorAll(){return [];}focus(){if(trackFocus&&testDocument){this.isConnected=true;testDocument.activeElement=this;}}blur(){if(trackFocus&&testDocument?.activeElement===this)testDocument.activeElement=testDocument.body;}select(){}setSelectionRange(){}scrollIntoView(){}matches(){return false;}closest(){return null;}
  }
  class TextArea extends Element{}
@@ -61,7 +61,7 @@ function fixture({deferInitialState=false,initialVisible=true,queuedAnimationFra
  vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(__dirname,'../locales.js'),'utf8'),context,{filename:'locales.js'});vm.runInContext(fs.readFileSync(path.join(__dirname,'../renderer.js'),'utf8'),context,{filename:'renderer.js'});
  async function ready(){await new Promise(setImmediate);}
  async function key(code,{ctrl=false,alt=false,shift=false,key,target,composing=false,keyCode=0}={}){const event={code,key:key||(/^Key/.test(code)?code.slice(3).toLowerCase():code==='Space'?' ':code),ctrlKey:ctrl,metaKey:false,altKey:alt,shiftKey:shift,repeat:false,isComposing:composing,keyCode,target:target||new Element(),preventDefault(){this.prevented=true;}};for(const listener of listeners.get('keydown')||[])await listener(event);await ready();return event;}
- async function click(action,extra={}){const target=new Element();target.dataset.action=action;Object.assign(target.dataset,extra);target.closest=selector=>selector==='[data-action]'?target:null;lastClick=target;if(trackFocus)target.focus();for(const listener of listeners.get('click')||[])listener({target,stopPropagation(){}});await ready();}
+ async function click(action,extra={}){const target=new Element();target.dataset.action=action;Object.assign(target.dataset,extra);if(action==='record-local'||action==='record-global')target.id='settings-'+action+'-'+extra.keyAction;target.closest=selector=>selector==='[data-action]'?target:null;lastClick=target;if(trackFocus)target.focus();for(const listener of listeners.get('click')||[])listener({target,stopPropagation(){}});await ready();}
  async function pointer(type,x,y){const target=document.getElementById('markup-canvas');for(const listener of listeners.get(type)||[])listener({target,clientX:x,clientY:y,pointerId:1,shiftKey:false,preventDefault(){}});await ready();}
  async function input(id,value){const target=document.getElementById(id);target.value=value;target.selectionStart=value.length;for(const listener of listeners.get('input')||[])await listener({target});await ready();}
  async function change(id,value){const target=document.getElementById(id);target.value=value;for(const listener of listeners.get('change')||[])await listener({target});await ready();}
@@ -716,9 +716,9 @@ test('IME composing Enter Escape and arrows stay native in Library search, text 
 });
 
 test('closing a Settings shortcut recorder restores focus to its opening control',async()=>{
- const f=fixture({trackFocus:true});await f.ready();await f.api.command('settings');await f.ready();await f.click('settings-tab',{tab:'shortcuts'});await f.click('record-local',{keyAction:'pin'});
+ const f=fixture({trackFocus:true});await f.ready();await f.api.command('settings');await f.ready();await f.click('settings-tab',{tab:'shortcuts'});await f.click('record-local',{keyAction:'pin'});assert.match(f.main,/id="settings-record-local-pin"/);
  const trigger=f.lastClick;assert.ok(f.focused?.insideOverlay);assert.notEqual(f.focused,trigger);
- await f.key('Escape');assert.equal(f.overlay,'');assert.equal(f.focused,trigger);
+ await f.key('Escape');assert.equal(f.overlay,'');assert.equal(f.focused?.id,trigger.id);assert.notEqual(f.focused,trigger);assert.equal(f.focused?.isConnected,true);
 });
 
 test('an old shortcut save completion cannot close a newer recorder or release its owned global-shortcut lease',async()=>{
