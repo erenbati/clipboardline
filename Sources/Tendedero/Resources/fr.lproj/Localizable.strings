@@ -529,3 +529,9 @@
 "Focus previous pane" = "Activer le volet précédent";
 
 "Undo Move to Trash" = "Annuler le déplacement vers la corbeille";
+
+/* Image markup errors. */
+"The image markup document is invalid." = "Le document de marquage de l’image n’est pas valide.";
+"This image could not be opened for markup." = "Impossible d’ouvrir cette image pour la marquer.";
+"Markup supports images up to 80 megapixels." = "Le marquage prend en charge les images jusqu’à 80 mégapixels.";
+"The marked image could not be rendered." = "Impossible de générer l’image annotée.";

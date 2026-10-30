@@ -529,3 +529,9 @@
 "Focus previous pane" = "Focus previous pane";
 
 "Undo Move to Trash" = "Undo Move to Trash";
+
+/* Image markup errors. */
+"The image markup document is invalid." = "The image markup document is invalid.";
+"This image could not be opened for markup." = "This image could not be opened for markup.";
+"Markup supports images up to 80 megapixels." = "Markup supports images up to 80 megapixels.";
+"The marked image could not be rendered." = "The marked image could not be rendered.";
