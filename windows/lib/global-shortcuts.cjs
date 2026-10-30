@@ -26,6 +26,14 @@ class GlobalShortcuts{
  }
  update(shortcuts){
   const rejected=[],swapped=new Set();
+  // Release explicitly disabled actions first so their keys can be reused
+  // by another action in this same settings update.
+  if(!this.suspended&&!this.disposed)for(const action of ACTIONS){
+   if(shortcuts[action]||!this.registered.has(action))continue;
+   const key=this.registered.get(action);
+   if(this.active.has(action))this.registry.unregister(key);
+   this.active.delete(action);this.epochs.delete(action);this.registered.delete(action);
+  }
   // A reciprocal swap only uses two shortcuts already owned by this instance.
   // Release both together, then restore both on failure instead of rejecting
   // valid bindings merely because each is still held by its old action.

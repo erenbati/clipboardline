@@ -522,7 +522,7 @@ function actionCommands(){
  const commands=keyboard.map(id=>{
   let reason='';
   if(selectedActions.has(id)&&!hasSelection)reason='Select an item first.';
-  else if(deleted&&['paste','pin','folder','name','tag','remove','markup','crop','copyOCR','edit'].includes(id))reason='Restore this item first.';
+  else if(deleted&&['paste','preview','pin','folder','name','tag','remove','markup','crop','copyOCR','edit'].includes(id))reason='Restore this item first.';
   else if(['crop',...Object.keys(MARKUP_TOOLS),'copyOCR'].includes(id)&&(!image||video))reason='Select a still image first.';
   else if(id==='markup'&&!image)reason='Select an image first.';
   else if(id==='edit'&&!text)reason='Select a text item first.';
@@ -677,7 +677,7 @@ case 'remove':if(ui.view==='library')await trashLibrarySelection(ids);else await
 case 'undoTrash':await undoLibraryTrash();break;
 case 'focusNextPane':await cycleLibraryPane(1);break;case 'focusPreviousPane':await cycleLibraryPane(-1);break;
 case 'newNote':if(await flushPreview())await perform('new-note');break;case 'newFolder':if(await flushPreview())await perform('new-folder');break;
-case 'trash':case 'delete':if(ids.length)openModal({type:'confirm',title:action==='delete'?'Delete permanently':'Move to Trash',label:action==='delete'?'Delete permanently':'Move to Trash',message:action==='delete'?`Permanently remove ${ids.length} records? This cannot be undone.`:`Move ${ids.length} selected records to recoverable Library Trash?`,command:action,payload:{ids}});break;
+case 'trash':case 'delete':if(ids.length)openModal({type:'confirm',title:action==='delete'?'Delete permanently':'Move to Trash',label:action==='delete'?'Delete permanently':'Move to Trash',message:action==='delete'?`Permanently remove ${ids.length} records? This cannot be undone.`:t('Move %d items to recoverable Trash?').replace('%d',String(ids.length)),command:action,payload:{ids}});break;
 case 'restore':if(ids.length){const restored=await command('restore',{ids});if(restored&&ui.view==='library'&&ui.scope==='trash'){reconcileLibraryFocus();render();}}break;
 case 'export':if(ids.length)await command('export',{ids});break;
 case 'open':if(value?.kind==='link')await command('openLink',{id:value.id});break;
@@ -777,9 +777,12 @@ async function saveImage(finish=true){const editor=ui.editor;if(!editor)return t
 function updateTransform(){const node=document.querySelector('.image-document');const stage=document.querySelector('.image-stage');if(node&&stage){const bounds=node.getBoundingClientRect();const maxX=Math.max(0,(bounds.width-stage.clientWidth)/2),maxY=Math.max(0,(bounds.height-stage.clientHeight)/2);ui.pan.x=Math.max(-maxX,Math.min(maxX,ui.pan.x));ui.pan.y=Math.max(-maxY,Math.min(maxY,ui.pan.y));}if(node)node.style.transform=`translate(${ui.pan.x}px,${ui.pan.y}px) scale(${ui.zoom})`;}
 function eventShortcut(event){const parts=[];if(event.ctrlKey||event.metaKey)parts.push('Ctrl');if(event.altKey)parts.push('Alt');if(event.shiftKey)parts.push('Shift');const code=event.code||'';const key=code.startsWith('Key')?code.slice(3):code.startsWith('Digit')?code.slice(5):code==='Space'?'Space':event.key;if(!key||['Control','Shift','Alt','Meta'].includes(key))return '';parts.push(key);return canonicalShortcut(parts.join('+'));}
 function modalKey(event){const modal=ui.modal;if(!modal)return false;
- // A focused Cancel/Save/option button owns its native activation. Enter from
- // an input can still run the dialog default without overriding that focus.
- if(overlays.contains?.(event.target.closest?.('button'))&&['Enter',' '].includes(event.key)&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!event.shiftKey)return true;
+ // A focused Cancel/Save/option button owns its activation. Enter from an input
+ // can still run the dialog default without overriding that focus. Enter clicks on
+ // keydown natively; Space clicks on keyup only if the same element saw the keydown,
+ // which a background overlay rebuild in between breaks, so click it on keydown.
+ const focusedButton=event.target.closest?.('button');
+ if(overlays.contains?.(focusedButton)&&['Enter',' '].includes(event.key)&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!event.shiftKey){if(event.key===' '){event.preventDefault();if(!event.repeat)focusedButton.click();}return true;}
  if(modal.type==='record'){event.preventDefault();if(event.key==='Escape'){closeModal();return true;}if(!modal.recordingReady)return true;if(event.key==='Backspace'||event.key==='Delete'){modal.key='';renderOverlay();return true;}const shortcut=eventShortcut(event);if(shortcut){modal.key=shortcut;renderOverlay();}return true;}if(event.key==='Escape'){event.preventDefault();closeModal();return true;}if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='n'&&modal.type==='folder'){event.preventDefault();const back=modal;openModal({type:'new-folder',title:'New folder',value:'',returnTo:back});return true;}if(['actions','folder','folder-actions','tag-actions'].includes(modal.type)&&['ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const options=currentModalOptions();let index=modal.index||0;const step=event.key==='ArrowUp'?-1:1;do{index+=step;}while(index>=0&&index<options.length&&options[index].disabled);if(index>=0&&index<options.length)modal.index=index;const value=document.getElementById('modal-query')?.value||'';renderOverlay();const field=document.getElementById('modal-query');field?.focus();field?.setSelectionRange(value.length,value.length);const selected=overlays.querySelector('.dialog-option.selected');if(['folder-actions','tag-actions'].includes(modal.type))selected?.focus();selected?.scrollIntoView({block:'nearest'});return true;}if(event.key==='Enter'&&!event.repeat&&(!(event.target instanceof HTMLTextAreaElement)||event.ctrlKey||event.metaKey)){event.preventDefault();void confirmModal();return true;}return false;}
 function isEditor(target){return target instanceof HTMLElement&&(target.matches('input,textarea,select')||target.isContentEditable);}
 document.addEventListener('keydown',async event=>{
