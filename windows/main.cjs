@@ -24,6 +24,7 @@ const {copyFiles,cancelFileCopies}=require('./lib/native-files.cjs');
 const {exportCopies}=require('./lib/export-copies.cjs');
 const {decodeTextFile}=require('./lib/text-file.cjs');
 const native = require('./lib/native.cjs');
+const {afterCurrent}=require('./lib/clipboard-sequence.cjs');
 const {PasteTargetTracker}=require('./lib/paste-target.cjs');
 const {DragFiles}=require('./lib/drag-files.cjs');
 const {metadataFetch,linkMetadata} = require('./lib/network.cjs');
@@ -455,7 +456,9 @@ else app.whenReady().then(async()=>{
   window.webContents.on('render-process-gone',()=>finishShortcutRecording());
   window.webContents.on('did-start-navigation',()=>finishShortcutRecording());
   await window.loadURL(entry);
-  monitor=native.monitor(()=>{if(!testMode)void readClipboard();},error=>{monitor?.kill();monitor=null;pasteTargets.clear();if(!closing)notify(error.message+' Falling back to bounded clipboard polling.');},focus=>pasteTargets.observe(focus));
+  // One filter per launch: a monitor restarted later would reuse it, so its first report (the clipboard after the gap) is read.
+  const onSequence=afterCurrent(()=>{if(!testMode)void readClipboard();});
+  monitor=native.monitor(onSequence,error=>{monitor?.kill();monitor=null;pasteTargets.clear();if(!closing)notify(error.message+' Falling back to bounded clipboard polling.');},focus=>pasteTargets.observe(focus));
   if(!testMode||testTray){
     if(process.platform==='win32')app.setAppUserModelId('com.clipboardline.desktop.windows');
     createTray();

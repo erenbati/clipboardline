@@ -19,4 +19,6 @@ class ClipboardSequenceQueries{
  }
  close(){this.closed=true;for(const value of this.pending.values()){clearTimeout(value.timer);value.reject(new Error('Clipboard sequence monitor stopped.'));}this.pending.clear();}
 }
-module.exports={ClipboardSequenceQueries};
+// The monitor's first report is the clipboard as it already is at launch. Capture starts with the next copy, as on macOS.
+const afterCurrent=changed=>{let current=true;return sequence=>{if(current){current=false;return;}changed(sequence);};};
+module.exports={ClipboardSequenceQueries,afterCurrent};
