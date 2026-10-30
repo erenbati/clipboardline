@@ -170,7 +170,8 @@ test('removing the active folder ancestor returns Library to Saved',async()=>{
 test('removing a folder that is not open keeps the current Library view',async()=>{
  const f=fixture();await f.ready();const keep='20000000-0000-4000-8000-000000000003',other='20000000-0000-4000-8000-000000000004';
  f.state.items[0].retainedAt=1000;f.state.items[0].folderIds=[keep];f.state.folders=[{id:keep,name:'Keep',parentId:null},{id:other,name:'Other',parentId:null}];f.api.emit({items:f.state.items,folders:f.state.folders});await f.ready();
- await savedLibrary(f);const command=f.api.command.bind(f.api);f.api.command=async(action,payload)=>{if(action==='removeFolder')f.state.folders=f.state.folders.filter(folder=>folder.id!==payload.id);return command(action,payload);};await f.click('folder-scope',{folder:keep});assert.deepEqual(cards(f),[f.image]);await f.click('remove-folder',{folder:other});await f.click('confirm-modal');
+ await savedLibrary(f);const command=f.api.command.bind(f.api),removed=[];f.api.command=async(action,payload)=>{if(action==='removeFolder'){removed.push(payload.id);f.state.folders=f.state.folders.filter(folder=>folder.id!==payload.id);}return command(action,payload);};await f.click('folder-scope',{folder:keep});assert.deepEqual(cards(f),[f.image]);await f.click('remove-folder',{folder:other});await f.click('confirm-modal');
+ assert.deepEqual(removed,[other]);assert.deepEqual(f.state.folders.map(folder=>folder.id),[keep]);
  assert.match(f.main,/<div class="window-title"><strong>Keep<\/strong>/);assert.doesNotMatch(f.main,/data-action="scope" data-scope="saved" class="active"/);assert.deepEqual(cards(f),[f.image]);
 });
 
