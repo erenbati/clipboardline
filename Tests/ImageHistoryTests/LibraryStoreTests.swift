@@ -92,6 +92,16 @@ import XCTest
         XCTAssertEqual(try library.query(LibraryQuery(scope: .recent, domain: "WWW.YouTube.com.")).count, 3)
         XCTAssertTrue(try library.query(LibraryQuery(scope: .recent, domain: "%youtube.com")).isEmpty)
     }
+    func testBlankOrPaddedItemNameIsIgnoredOrTrimmedLikeWindows() throws {
+        let f = try SyntheticFixture(); defer { f.cleanup() }; let library = try store(f)
+        let plan = try XCTUnwrap(library.captureText("Quarterly plan\nsecond line")), other = try XCTUnwrap(library.captureText("Middle"))
+        try library.retain([plan.id, other.id])
+        try library.update(plan.id) { $0.title = "   " }
+        XCTAssertEqual(try library.item(plan.id)?.displayTitle, "Quarterly plan")
+        try library.update(plan.id) { $0.title = "  Zulu \n" }
+        XCTAssertEqual(try library.item(plan.id)?.displayTitle, "Zulu")
+        XCTAssertEqual(try library.query(LibraryQuery(scope: .saved, sort: .title)).map(\.id), [other.id, plan.id])
+    }
     func testTagRenameSearchTurkishAndLiteralSQLCharacters() throws {
         let f = try SyntheticFixture(); defer { f.cleanup() }; let library = try store(f)
         let record = try XCTUnwrap(library.captureText("İLK çekim 中文 👋"))
