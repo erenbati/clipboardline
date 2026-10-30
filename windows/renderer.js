@@ -53,7 +53,7 @@ const item = id => {if(indexedItems!==state.items){indexedItems=state.items;item
 const saved = value => value.pinned || value.retainedAt!=null || value.folderIds?.length || value.tags?.length;
 // Match macOS displayTitle: a text's trimmed first line capped at 120 characters, a link's host.
 const titleSegments = new Intl.Segmenter('en',{granularity:'grapheme'});
-function firstLine(text){const line=String(text||'').split(/\r?\n/,1)[0].replace(/^[\p{Zs}\t]+|[\p{Zs}\t]+$/gu,'');if(line.length<=120)return line;let out='',count=0;for(const {segment} of titleSegments.segment(line.slice(0,2000))){if(count++===120)break;out+=segment;}return out;}
+function firstLine(text){const line=String(text||'').split(/\r?\n/,1)[0].replace(/^[\p{Zs}\t]+|[\p{Zs}\t]+$/gu,'');if(line.length<=120)return line;let out='',count=0;for(const {segment} of titleSegments.segment(line)){if(count++===120)break;out+=segment;}return out;}
 const title = value => value.name || value.title || (value.kind==='text' ? firstLine(value.text) : value.kind==='link' ? (()=>{try{return new URL(value.url).hostname;}catch{return value.url;}})() : value.recording ? 'Video' : 'Image') || 'Untitled';
 const thumbnail = value => { const url=value?.thumbnailUrl || value?.mediaUrl || ''; return /^appmedia:\/\/media\/[a-f0-9-]+(?:\/original|\/thumbnail)?(?:\?[^\s]*)?$/.test(url) || /^data:image\/(png|jpeg|webp);base64,[a-z0-9+/=]+$/i.test(url) ? url : ''; };
 const previewMedia = value => thumbnail(value?.kind==='image'?{...value,thumbnailUrl:''}:value);
