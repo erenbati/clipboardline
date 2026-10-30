@@ -64,6 +64,12 @@
         "behavior": "Restoring items from Library Trash moves focus and selection to the first item that remains in Trash, and clears the details panel when none remain, so the panel never shows Restore for an item that already left Trash.",
         "macos": "LibraryModel.restore() queues a keyboard selection that finishKeyboardSelection resolves to the first remaining item after the reload; LibraryInteractionTests.testRestoringFromTrashSelectsTheFirstRemainingItemLikeWindows covers it.",
         "windows": "The restore action calls reconcileLibraryFocus() and renders, which keeps a surviving focus or falls back to the first remaining item; library-ui.test.cjs covers it."
+      },
+      {
+        "id": "item-name-trimming",
+        "behavior": "An item name is used without its surrounding whitespace, and a name that is only whitespace counts as no name, so the card, the title ordering and the search index fall back to the item's content instead of showing a blank title.",
+        "macos": "LibraryRecord.displayTitle trims the stored title and ignores a blank one; LibraryStoreTests.testBlankOrPaddedItemNameIsIgnoredOrTrimmedLikeWindows covers it.",
+        "windows": "The details command stores the name trimmed and title() falls back to the content for an empty name; model.test.cjs covers a blank and a padded name."
       }
     ]
   },

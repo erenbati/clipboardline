@@ -46,7 +46,8 @@ struct LibraryRecord: Codable, Equatable, Identifiable {
     var metadataState = "pending"
     var metadataAttemptedAt: Date?
     var displayTitle: String {
-        if !title.isEmpty { return title }
+        let name = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !name.isEmpty { return name }
         if kind == .link, let metadataTitle, !metadataTitle.isEmpty { return metadataTitle }
         if let text { return String(text.split(separator: "\n", omittingEmptySubsequences: false).first ?? "").trimmingCharacters(in: .whitespaces).prefix(120).description }
         if let path { return URL(fileURLWithPath: originalPath ?? path).deletingPathExtension().lastPathComponent }

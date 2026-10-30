@@ -64,6 +64,8 @@ this on both platforms with an image, a text and a link selected.
 `trash-restore-selection` requires restoring items from Library Trash to move
 focus and selection to the first item that remains in Trash and to clear the
 details panel when none remain.
+`item-name-trimming` requires an item name to be used without surrounding
+whitespace and a whitespace-only name to count as no name.
 
 The adapters execute application behavior:
 
