@@ -35,7 +35,7 @@ async function main(){
   assert.equal(await page.evaluate(()=>window.__shelfPerformance.renderer.ui.preview),null,'tag filtering does not open a preview');
   checks.push({name:'Library tag checkboxes retain keyboard focus across single and combined filters without opening a preview',passed:true});
   console.log('PASS Library tag checkboxes retain keyboard focus across single and combined filters without opening a preview');
-  await page.evaluate(()=>{const r=window.__shelfPerformance.renderer;r.ui.filterTags=[];r.ui.filtersOpen=false;r.render();r.focusLibraryResults();});
+  await page.evaluate(()=>{const r=window.__shelfPerformance.renderer;r.ui.filterTags=[];r.ui.filtersOpen=false;r.render();const card=document.querySelector('.library-grid [data-item-id="'+r.ui.focus+'"]'),target=card||document.querySelector('.library-grid');target?.focus?.({preventScroll:true});});
   await page.evaluate(()=>{const r=window.__shelfPerformance.renderer;r.ui.sort='titleDescending';r.ui.filtersOpen=true;r.render();});
   await journey({page,fixture,until,editorSelectAll:process.platform==='darwin'?'Meta+a':'Control+a',check:(name,details={})=>{checks.push({name,passed:true,...details});console.log('PASS '+name);}});
   const oldSaveName=fixture.prefix+' pending old save';
