@@ -316,7 +316,8 @@ function configureShortcuts(previousPreferences=null) {
   const rejected=shortcutRegistry.update(store.data.settings.shortcuts);
   if(rejected.length){
     if(previousPreferences)store.modify('setSettings',{patch:{shortcuts:Object.fromEntries(rejected.map(value=>[value.action,previousPreferences[value.action]||'']))}});
-    message='Shortcut '+rejected.map(value=>value.shortcut).join(', ')+' is unavailable. '+(rejected.some(value=>value.previous)?'Working previous shortcuts are kept.':'Choose another combination in Settings.');
+    const unrestored=rejected.filter(value=>value.restorationFailed).map(value=>value.action);
+    message='Shortcut '+rejected.map(value=>value.shortcut).join(', ')+' is unavailable. '+(unrestored.length?'Could not restore: '+unrestored.join(', ')+'.':rejected.some(value=>value.previous)?'Working previous shortcuts are kept.':'Choose another combination in Settings.');
   }
   return rejected;
 }
