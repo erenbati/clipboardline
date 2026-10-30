@@ -16,12 +16,13 @@ const crypto = require('node:crypto');
 const {pathToFileURL} = require('node:url');
 const {spawn} = require('node:child_process');
 const {Store,plainURL,ids} = require('./lib/model.cjs');
-const {privateClipboard,readClipboardContent}=require('./lib/clipboard-policy.cjs');
+const {privateClipboard,readClipboardContent,repeatedGeneration}=require('./lib/clipboard-policy.cjs');
 const {mediaOrigin}=require('./lib/media-policy.cjs');
 const {mediaResponse,mediaGenerationMatches}=require('./lib/media-response.cjs');
 const {MediaJobs,MAXIMUM_VIDEO_BYTES}=require('./lib/media.cjs');
 const {copyFiles,cancelFileCopies}=require('./lib/native-files.cjs');
 const {exportCopies}=require('./lib/export-copies.cjs');
+const {decodeTextFile}=require('./lib/text-file.cjs');
 const native = require('./lib/native.cjs');
 const {PasteTargetTracker}=require('./lib/paste-target.cjs');
 const {DragFiles}=require('./lib/drag-files.cjs');
@@ -29,6 +30,7 @@ const {metadataFetch,linkMetadata} = require('./lib/network.cjs');
 const {Updates,AutomaticUpdateScheduler} = require('./lib/updates.cjs');
 const {GlobalShortcuts}=require('./lib/global-shortcuts.cjs');
 const {ImageSearch,modelPaths}=require('./lib/image-search.cjs');
+const {createOcrQueue}=require('./lib/ocr-queue.cjs');
 const {StatusTray,trayIcon,translated}=require('./lib/status-summary.cjs');
 const {WindowBounds}=require('./lib/window-bounds.cjs');
 const {MotionBridge}=require('./lib/shelf-motion.cjs');
@@ -42,7 +44,7 @@ if(development){const directory=path.join(app.getPath('appData'),'ClipBoardLine 
 app.setName(development?'ClipBoardLine Dev':'ClipBoardLine');
 protocol.registerSchemesAsPrivileged([{scheme:'appmedia',privileges:{standard:true,secure:true,supportFetchAPI:true,corsEnabled:true,stream:true}}]);
 let window,store,tray,trayPresentation,updates,updateScheduler,monitor,clipboardTimer,retentionTimer,updateTimer,updateLaunchTimer,previous=null,view='shelves',message='',viewEvent=null;
-let lastFingerprint='',ownFingerprint='',capturing=false,pendingClipboard=false,showing=0,closing=false,watchers=[],normalBounds=null,normalMaximized=false,applyingBounds=false;
+let lastGeneration={sequence:0},ownFingerprint='',capturing=false,pendingClipboard=false,showing=0,closing=false,watchers=[],normalBounds=null,normalMaximized=false,applyingBounds=false;
 let pastePromise=null,hidePromise=null,pasteGeneration=0;
 let lastBroadcastLibraryRevision=-1,windowSurface=null;
 let visibilityGeneration=0,desiredVisible=false;
@@ -52,7 +54,16 @@ const pasteTargets=new PasteTargetTracker(process.pid);
 const entry = pathToFileURL(path.join(__dirname,'index.html')).href;
 const copyMarker = crypto.randomBytes(16);
 const pending = new Map();
-const ocrJobs=new Map(),ocrQueue=[];let indexing=false;
+const ocrJobs=new Map();
+const {queue:ocrQueue,queueOCR}=createOcrQueue({
+ enabled:()=>!testMode&&!!store?.data.settings.indexImages,
+ closing:()=>closing,
+ process:async next=>{
+  const item=store.data.items.find(i=>i.id===next);if(!item||item.trashedAt||item.ocrText)return;
+  const fingerprint=item.renderedFile||item.imageFile;try{await ocr(next,true);}catch{}
+  if(store.data.items.includes(item)&&(item.renderedFile||item.imageFile)!==fingerprint)queueOCR(next);
+ }
+});
 const mediaDiagnostics=[];
 let imageSearch,imageSearchTimer,dragFiles,mediaJobs;
 const recordingTrims=new Map();
@@ -168,7 +179,7 @@ async function readClipboard() {
   try{
     const content=await clipboardContent();if(!content)return;
     if(content.raced){pendingClipboard=true;return;}
-    if(content.fingerprint===lastFingerprint)return;lastFingerprint=content.fingerprint;
+    if(repeatedGeneration(lastGeneration,content))return;
     if(content.fingerprint===ownFingerprint){ownFingerprint='';return;}
     if(content.owned)return;
     const key={image:'captureImages',text:'captureText',link:'captureLinks'}[content.kind];if(!store.data.settings[key])return;
@@ -187,10 +198,10 @@ async function enrich(id,{refresh=false}={}) {
     if(refresh){delete item.thumbnailFile;delete item.author;item.title=new URL(url).hostname;store.persist();broadcast();}
     const metadata=await linkMetadata(url);
     if(!current()||!store.data.items.includes(item)||item.trashedAt||item.url!==url)return;
-    let thumbnailFile='';
-    if(metadata.thumbnail){try{const response=await metadataFetch(metadata.thumbnail,{maximum:2*1024*1024});const image=nativeImage.createFromBuffer(response.bytes);if(!image.isEmpty()){const size=image.getSize();if(size.width*size.height<=16_000_000)thumbnailFile=store.putPNG(image.resize({width:Math.min(size.width,640)}).toPNG());}}catch{}}
+    let thumbnail=null;
+    if(metadata.thumbnail){try{const response=await metadataFetch(metadata.thumbnail,{maximum:2*1024*1024});const image=nativeImage.createFromBuffer(response.bytes);if(!image.isEmpty()){const size=image.getSize();if(size.width*size.height<=16_000_000)thumbnail=image.resize({width:Math.min(size.width,640)}).toPNG();}}catch{}}
     if(!current()||!store.data.items.includes(item)||item.trashedAt||item.url!==url)return;
-    item.title=metadata.title||new URL(url).hostname;item.author=metadata.author||'';if(thumbnailFile)item.thumbnailFile=thumbnailFile;store.persist();broadcast();
+    if(store.setLinkMetadata(item,url,{title:metadata.title,author:metadata.author,thumbnail}))broadcast();
   }catch(error){if(refresh&&current())throw new Error('Link preview could not be refreshed: '+error.message);}
   finally{if(pending.get(id)===generation)pending.delete(id);}
 }
@@ -200,16 +211,16 @@ async function writeClipboard(selected) {
   const values=selected.filter(item=>item.kind!=='image').map(item=>item.kind==='link'?item.url:item.text);
   if(images.some(item=>item.recording)){
     await copyFiles({files:images.map(item=>store.mediaPath(item.id)),marker:copyMarker.toString('base64'),text:values.join('\n\n')});
-    ownFingerprint=(await clipboardContent())?.fingerprint||'';lastFingerprint=ownFingerprint;store.markCopied(selected.filter(item=>store.data.items.includes(item)).map(item=>item.id));return;
+    ownFingerprint=(await clipboardContent())?.fingerprint||'';store.markCopied(selected.filter(item=>store.data.items.includes(item)).map(item=>item.id));return;
   }
   if(images.length>1){
     await native.copyImages({files:images.map(item=>store.mediaPath(item.id)),marker:copyMarker.toString('base64'),text:values.join('\n\n')});
-    ownFingerprint=(await clipboardContent())?.fingerprint||'';lastFingerprint=ownFingerprint;store.markCopied(selected.filter(item=>store.data.items.includes(item)).map(item=>item.id));return;
+    ownFingerprint=(await clipboardContent())?.fingerprint||'';store.markCopied(selected.filter(item=>store.data.items.includes(item)).map(item=>item.id));return;
   }
   const data={'web application/x.clipboardline':new Blob([copyMarker])};if(values.length)data['text/plain']=new Blob([values.join('\n\n')],{type:'text/plain'});
   if(images.length){const image=nativeImage.createFromPath(store.mediaPath(images[0].id));if(image.isEmpty())throw new Error('Image unavailable');data['image/png']=new Blob([image.toPNG()],{type:'image/png'});}
   await clipboard.write([new ClipboardItem(data)]);
-  ownFingerprint=(await clipboardContent())?.fingerprint||'';lastFingerprint=ownFingerprint;store.markCopied(selected.filter(item=>store.data.items.includes(item)).map(item=>item.id));
+  ownFingerprint=(await clipboardContent())?.fingerprint||'';store.markCopied(selected.filter(item=>store.data.items.includes(item)).map(item=>item.id));
 }
 async function copy(payload,paste=false) {
   if(pastePromise)return pastePromise;
@@ -248,7 +259,7 @@ async function importFile(file) {
     }finally{mediaJobs.release(inspected);}
   }
   if(stat.size>64*1024*1024)throw new Error('File exceeds import limit');
-  if(['.txt','.md'].includes(extension)) {if(stat.size>1024*1024)throw new Error('Text file exceeds import limit');const value=fs.readFileSync(file,'utf8').replace(/^\uFEFF/,'');return store.insert(plainURL(value)?'link':'text',value);}
+  if(['.txt','.md'].includes(extension)) {if(stat.size>1024*1024)throw new Error('Text file exceeds import limit');const value=decodeTextFile(fs.readFileSync(file));return store.insert(plainURL(value)?'link':'text',value);}
   const image=nativeImage.createFromPath(file);if(image.isEmpty())throw new Error('Unsupported image file');const item=store.insert('image',image.toPNG());queueOCR(item.id);refreshImageSearch();return item;
 }
 async function capture() {
@@ -262,7 +273,6 @@ async function capture() {
     const item=store.insert('image',source.thumbnail.toPNG());queueOCR(item.id);refreshImageSearch();await show('shelves',{selectId:item.id,kind:'image',preview:true,crop:true});return{id:item.id};
   }catch(error){if(wasVisible)await show(view);throw error;}
 }
-function queueOCR(id){if(testMode||!store.data.settings.indexImages||ocrQueue.includes(id)||ocrQueue.length>=64)return;ocrQueue.push(id);if(indexing)return;indexing=true;setImmediate(async()=>{try{while(ocrQueue.length&&!closing){const next=ocrQueue.shift(),item=store.data.items.find(i=>i.id===next);if(!item||item.trashedAt||item.ocrText)continue;const fingerprint=item.renderedFile||item.imageFile;try{await ocr(next,true);}catch{}if(store.data.items.includes(item)&&(item.renderedFile||item.imageFile)!==fingerprint&&!ocrQueue.includes(next))ocrQueue.push(next);}}finally{indexing=false;}});}
 async function ocr(id,quiet=false){if(ocrJobs.has(id))return ocrJobs.get(id);const promise=recognize(id,quiet);ocrJobs.set(id,promise);try{return await promise;}finally{ocrJobs.delete(id);}}
 async function recognize(id,quiet=false) {
   const item=store.item(id);if(item.kind!=='image'||item.recording)throw new Error('OCR requires a still image');
@@ -306,7 +316,8 @@ function configureShortcuts(previousPreferences=null) {
   const rejected=shortcutRegistry.update(store.data.settings.shortcuts);
   if(rejected.length){
     if(previousPreferences)store.modify('setSettings',{patch:{shortcuts:Object.fromEntries(rejected.map(value=>[value.action,previousPreferences[value.action]||'']))}});
-    message='Shortcut '+rejected.map(value=>value.shortcut).join(', ')+' is unavailable. '+(rejected.some(value=>value.previous)?'Working previous shortcuts are kept.':'Choose another combination in Settings.');
+    const unrestored=rejected.filter(value=>value.restorationFailed).map(value=>value.action);
+    message='Shortcut '+rejected.map(value=>value.shortcut).join(', ')+' is unavailable. '+(unrestored.length?'Could not restore: '+unrestored.join(', ')+'.':rejected.some(value=>value.previous)?'Working previous shortcuts are kept.':'Choose another combination in Settings.');
   }
   return rejected;
 }
@@ -375,9 +386,10 @@ async function command(action,payload={}) {
     if(payload.recordingToken!==undefined){if(typeof payload.recordingToken!=='string')throw new Error('Invalid shortcut recorder.');finishShortcutRecording(payload.recordingToken);}
     const patch={...payload.patch};
     if(Object.hasOwn(patch,'watchFolders'))throw new Error('Choose watched folders with the folder picker.');
+    const wasIndexingImages=!!store.data.settings.indexImages;
     const previousShortcuts={...store.data.settings.shortcuts};
-    store.modify('setSettings',{patch});if(Object.hasOwn(patch,'retentionDays'))refreshImageSearch();if(Object.hasOwn(patch,'shortcuts')&&configureShortcuts(previousShortcuts).length)result={error:message};
-    if(['captureText','captureImages','captureLinks'].some(key=>Object.hasOwn(patch,key)))lastFingerprint='';
+    store.modify('setSettings',{patch});if(wasIndexingImages&&!store.data.settings.indexImages)ocrQueue.discardPending();if(Object.hasOwn(patch,'retentionDays'))refreshImageSearch();if(Object.hasOwn(patch,'shortcuts')&&configureShortcuts(previousShortcuts).length)result={error:message};
+    if(['captureText','captureImages','captureLinks'].some(key=>Object.hasOwn(patch,key)))lastGeneration.sequence=0;
     if(Object.hasOwn(patch,'launchAtLogin')&&!testMode)app.setLoginItemSettings({openAtLogin:patch.launchAtLogin});
     if(Object.hasOwn(patch,'autoCheckUpdates')&&patch.autoCheckUpdates&&!development)void updateScheduler.tick({force:true});
   }else if(action==='watchFolder'||action==='chooseWatchFolder'){const response=await dialog.showOpenDialog(window,{properties:['openDirectory']});if(response.filePaths[0]){store.modify('setSettings',{patch:{watchFolders:[...store.data.settings.watchFolders,response.filePaths[0]]}});configureWatchers();}}
