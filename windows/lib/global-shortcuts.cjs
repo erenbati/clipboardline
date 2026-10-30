@@ -56,13 +56,14 @@ class GlobalShortcuts{
    if(success)for(const item of cycle)this.registered.set(item.action,item.next);
    else{
     for(const item of installed){try{this.registry.unregister(item.next);}catch{}this.active.delete(item.action);this.epochs.delete(item.action);}
+    const restorationFailed=new Set();
     for(const item of cycle){
      if(this.active.has(item.action))continue;
      let restored=false;try{restored=this.register(item.action,item.previous);}catch{}
      if(restored)this.active.add(item.action);
-     else{this.registered.delete(item.action);this.failed(new Error('A shortcut could not be restored after a failed rotation.'));}
+     else{this.registered.delete(item.action);restorationFailed.add(item.action);this.failed(new Error('A shortcut could not be restored after a failed rotation.'));}
     }
-    rejected.push(...cycle.map(item=>({action:item.action,shortcut:item.next,previous:item.previous})));
+    rejected.push(...cycle.map(item=>({action:item.action,shortcut:item.next,previous:item.previous,...(restorationFailed.has(item.action)?{restorationFailed:true}:{})})));
    }
    for(const item of cycle)swapped.add(item.action);
   }
