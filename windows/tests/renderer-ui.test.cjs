@@ -772,6 +772,11 @@ test('Settings shortcut filter matches the displayed localized action titles as 
  await f.input('shortcut-filter','Sabitle');assert.ok(rows().includes('pin'));assert.ok(!rows().includes('copy'));
  await f.input('shortcut-filter','copy');assert.ok(rows().includes('copy'));
 });
+test('the empty-selection toast uses the shared "Select an item first" catalog entry',async()=>{
+ const f=fixture();await f.ready();
+ f.api.emit({items:[],settings:{...f.state.settings,language:'tr'}});await f.ready();await f.key('KeyC',{ctrl:true});
+ assert.equal(f.nodes.get('toast').textContent,'Önce bir öğe seç');
+});
 test('the Move to Trash confirmation uses the shared localized catalog entry',async()=>{
  const f=fixture();await f.ready();await keyboardSaved(f);
  f.api.emit({settings:{...f.state.settings,language:'tr'}});await f.ready();await f.click('trash');
