@@ -22,9 +22,10 @@ test('a scalar native file-helper reply rejects without terminating the main pro
  vm.runInNewContext(fs.readFileSync(file,'utf8'),sandbox,{filename:file});
  sandbox.module.exports.copyFiles({files:[source]}).then(
   ()=>{console.error('Unexpected native success');process.exitCode=2;},
-  err=>{if(!/helper did not respond/.test(err.message)){console.error(err);process.exitCode=3;}}
+  err=>{if(!/helper did not respond/.test(err.message)){console.error(err);process.exitCode=3;}else{console.log('expected-rejection');}}
  );
  `;
  const child=spawnSync(process.execPath,['-e',helper,require.resolve('../lib/native-files.cjs'),source],{encoding:'utf8',timeout:6000});
  assert.equal(child.status,0,'Main process should survive malformed native output: '+(child.stderr||child.error||''));
+ assert.equal(child.stdout.trim(),'expected-rejection','the helper must reject, not simply exit with an unresolved promise');
 });
