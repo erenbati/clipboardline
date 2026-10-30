@@ -68,8 +68,9 @@ details panel when none remain.
 Trash, as the copy shortcut already works there, while editing actions wait for
 Restore.
 `item-display-title` requires an unnamed text to be titled by its first non-blank
-line, trimmed and capped at 120 characters, and a link without a fetched title by its
-host name.
+line, trimmed and capped at 120 grapheme clusters (Untitled note when every line is
+blank), and a link without a fetched title by its host name (Link when the stored URL
+does not parse).
 
 The adapters execute application behavior:
 
