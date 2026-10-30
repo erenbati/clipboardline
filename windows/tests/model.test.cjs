@@ -129,6 +129,10 @@ test('retaining and inspector details save without pinning and preserve content 
  time(3000);assert.equal(s.insert('text','Exact value').id,item.id);assert.equal(item.note,'Searchable note');assert.equal(item.name,'Friendly name');assert.equal(item.retainedAt,1000);
  const image=s.insert('image',png);assert.throws(()=>s.modify('details',{ids:[item.id,image.id],name:'Must roll back',text:'Invalid mixed edit'}));assert.equal(s.item(item.id).name,'Friendly name');
 }));
+test('a blank or padded item name is trimmed so a blank one falls back to the content',()=>fixture(s=>{
+ const item=s.insert('text','Quarterly plan\nsecond line');s.modify('details',{id:item.id,name:'   '});assert.equal(item.name,'');
+ s.modify('details',{id:item.id,name:'  Padded name \t'});assert.equal(item.name,'Padded name');
+}));
 test('old pinned and organized records migrate to sticky Saved without changing original dates',()=>fixture((s,time,dir)=>{
  const item=s.insert('text','Legacy saved');s.modify('pin',{id:item.id});delete item.retainedAt;s.persist();time(9000);
  const restored=new Store(dir,{clock:()=>9000}),value=restored.item(item.id);assert.equal(value.retainedAt,1000);assert.equal(value.createdAt,1000);assert.equal(value.updatedAt,1000);
