@@ -83,7 +83,7 @@
 "Library could not be opened. Existing history is kept; capture is paused." = "Kütüphane açılamadı. Mevcut geçmiş korundu; yakalama duraklatıldı.";
 "Library could not be saved or opened" = "Kütüphane kaydedilemedi veya açılamadı";
 "Library…" = "Kütüphane…";
-"Link" = "Link";
+"Link" = "Bağlantı";
 "Link copied" = "Link kopyalandı";
 "Link preview" = "Link önizlemesi";
 "Link preview could not be saved; the link is kept" = "Link önizlemesi kaydedilemedi; link korundu";
