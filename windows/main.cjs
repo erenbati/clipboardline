@@ -283,14 +283,16 @@ async function recognize(id,quiet=false) {
   const {createWorker}=require('tesseract.js');
   const languageDirectory=path.join(store.directory,'ocr-models');fs.mkdirSync(languageDirectory,{recursive:true});
   const OCR_HASHES={eng:'45b4cb346724ac1774f1c36f42f182b887bcdb28ebe63e6fff90ac41f3fcff91',tur:'384ba0dc28040451b7818d7d60e0a88df0d3003fa5a01d713a468779bc3d8c04'};
-  const validFile=(f,hash)=>fs.existsSync(f)&&crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex')===hash;
+  const validFile=(f,hash)=>{try{return fs.existsSync(f)&&crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex')===hash;}catch{return false;}};
   for(const language of ['eng','tur']) {
+    const staleDecompressed=path.join(languageDirectory,language+'.traineddata');
+    try{if(fs.existsSync(staleDecompressed))fs.unlinkSync(staleDecompressed);}catch(err){console.warn('Could not remove stale OCR cache:',err?.message||err);}
     const expected=OCR_HASHES[language];
     const source=app.isPackaged?path.join(process.resourcesPath,'ocr-data',language,'4.0.0_best_int',language+'.traineddata.gz'):path.join(__dirname,'node_modules','@tesseract.js-data',language,'4.0.0_best_int',language+'.traineddata.gz');
     const destination=path.join(languageDirectory,language+'.traineddata.gz');
     if(!verifiedOcrModels.has(destination)){if(!validFile(destination,expected)){if(!validFile(source,expected))throw new Error(`OCR source model invalid for ${language}`);fs.copyFileSync(source,destination);if(!validFile(destination,expected))throw new Error(`OCR model integrity verification failed for ${language}`);}verifiedOcrModels.add(destination);}
   }
-  const worker=await createWorker(['eng','tur'],1,{langPath:languageDirectory,cachePath:languageDirectory,gzip:true});
+  const worker=await createWorker(['eng','tur'],1,{langPath:languageDirectory,cachePath:languageDirectory,cacheMethod:'none',gzip:true});
   try{let image=nativeImage.createFromPath(file);const size=image.getSize(),scale=Math.min(1,2400/Math.max(size.width,size.height));if(scale<1)image=image.resize({width:Math.round(size.width*scale),height:Math.round(size.height*scale)});const result=await worker.recognize(image.toPNG());if(!store.data.items.includes(item)||(item.renderedFile||item.imageFile)!==fingerprint)throw new Error('Image changed during recognition');item.ocrText=String(result.data.text||'').slice(0,1024*1024);store.persist();if(!quiet)notify(item.ocrText?'Image text ready':'No text found');else broadcast();return{text:item.ocrText,id};}
   finally{await worker.terminate();}
 }
