@@ -59,8 +59,9 @@ Turkish letters.
 selection of pinned and unpinned items to pin all of them, and to unpin only
 when every selected item is already pinned; the Library keyboard contract executes
 this on both platforms with an image, a text and a link selected.
-`subfolder-title` requires the Library title of a subfolder to read
-`Parent / Child`, so same-named subfolders can be told apart.
+`subfolder-title` requires the Library title of a subfolder to list every
+ancestor, outermost first (`Parent / Child`, `Parent / Middle / Child`), so
+same-named subfolders of different parents can be told apart.
 `trash-restore-selection` requires restoring items from Library Trash to move
 focus and selection to the first item that remains in Trash and to clear the
 details panel when none remain.

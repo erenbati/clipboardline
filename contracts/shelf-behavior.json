@@ -55,7 +55,7 @@
       },
       {
         "id": "subfolder-title",
-        "behavior": "The Library title of a subfolder is its parent's name and its own name joined with \" / \" (for example Parent / Child), so same-named subfolders of different parents can be told apart; a top-level folder shows only its name.",
+        "behavior": "The Library title of a subfolder is the names of all its ancestors and its own name, outermost first, joined with \" / \" (for example Parent / Child, or Parent / Middle / Child for imported deeper folders), so same-named subfolders of different parents can be told apart; a top-level folder shows only its name.",
         "macos": "LibraryModel.title builds the path by walking the whole LibraryCollection.parentID chain (cycle-safe) and shows it as the Library window title; LibraryInteractionTests.testSubfolderTitleIncludesItsParentLikeWindows covers it.",
         "windows": "libraryTitle() in renderer.js shows folderPath() for the folder scope; library-ui.test.cjs checks the toolbar title of a subfolder."
       },
