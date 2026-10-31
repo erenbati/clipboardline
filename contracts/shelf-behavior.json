@@ -72,6 +72,12 @@
         "windows": "actionCommands() in renderer.js leaves copy out of the actions disabled for Trash items; library-ui.test.cjs checks the action list in Trash."
       },
       {
+        "id": "item-name-trimming",
+        "behavior": "An item name is used without its surrounding whitespace, and a name that is only whitespace counts as no name, so the card, the title ordering and the search index fall back to the item's content instead of showing a blank title.",
+        "macos": "LibraryRecord.displayTitle trims the stored title and ignores a blank one; LibraryStoreTests.testBlankOrPaddedItemNameIsIgnoredOrTrimmedLikeWindows covers it.",
+        "windows": "The details command stores the name trimmed and title() falls back to the content for an empty name; model.test.cjs covers a blank and a padded name."
+      },
+      {
         "id": "item-display-title",
         "behavior": "An item without a name is titled by its content: a text by its first line that is not blank, with surrounding spaces and tabs removed and at most 120 grapheme clusters (lines end at LF or CRLF) and the localized \"Untitled note\" when every line is blank, a link by its fetched page title or else its host name and the localized \"Link\" when the stored URL does not parse, so an indented snippet or a long copied URL reads the same on both platforms.",
         "macos": "LibraryRecord.displayTitle returns the first non-blank line, trimmed and capped at 120 characters (Characters are grapheme clusters), or L(\"Untitled note\") for an all-blank text, and the metadata title, the URL host or L(\"Link\") for a link; LibraryInteractionTests.testUnnamedItemTitlesAreTheTrimmedFirstLineAndLinkHostLikeWindows covers it.",

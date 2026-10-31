@@ -529,3 +529,9 @@
 "Focus previous pane" = "Əvvəlki bölməyə fokuslan";
 
 "Undo Move to Trash" = "Zibil qutusuna köçürməni geri al";
+
+/* Image markup errors. */
+"The image markup document is invalid." = "Şəkil işarələmə sənədi yanlışdır.";
+"This image could not be opened for markup." = "Bu şəkil işarələmə üçün açıla bilmədi.";
+"Markup supports images up to 80 megapixels." = "İşarələmə 80 meqapiksələ qədər şəkilləri dəstəkləyir.";
+"The marked image could not be rendered." = "İşarələnmiş şəkil hazırlana bilmədi.";

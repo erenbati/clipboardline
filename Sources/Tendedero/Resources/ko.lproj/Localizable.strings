@@ -529,3 +529,9 @@
 "Focus previous pane" = "이전 패널로 포커스 이동";
 
 "Undo Move to Trash" = "휴지통으로 이동 실행 취소";
+
+/* Image markup errors. */
+"The image markup document is invalid." = "이미지 마크업 문서가 올바르지 않습니다.";
+"This image could not be opened for markup." = "이 이미지를 마크업용으로 열 수 없습니다.";
+"Markup supports images up to 80 megapixels." = "마크업은 최대 8천만 화소의 이미지를 지원합니다.";
+"The marked image could not be rendered." = "마크업한 이미지를 렌더링할 수 없습니다.";
