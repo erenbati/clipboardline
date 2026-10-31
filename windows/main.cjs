@@ -55,6 +55,7 @@ const entry = pathToFileURL(path.join(__dirname,'index.html')).href;
 const copyMarker = crypto.randomBytes(16);
 const pending = new Map();
 const ocrJobs=new Map();
+const verifiedOcrModels=new Set();
 const {queue:ocrQueue,queueOCR}=createOcrQueue({
  enabled:()=>!testMode&&!!store?.data.settings.indexImages,
  closing:()=>closing,
@@ -287,7 +288,7 @@ async function recognize(id,quiet=false) {
     const expected=OCR_HASHES[language];
     const source=app.isPackaged?path.join(process.resourcesPath,'ocr-data',language,'4.0.0_best_int',language+'.traineddata.gz'):path.join(__dirname,'node_modules','@tesseract.js-data',language,'4.0.0_best_int',language+'.traineddata.gz');
     const destination=path.join(languageDirectory,language+'.traineddata.gz');
-    if(!validFile(destination,expected)){if(validFile(source,expected))fs.copyFileSync(source,destination);else if(!validFile(destination,expected))throw new Error(`OCR model integrity verification failed for ${language}`);}
+    if(!verifiedOcrModels.has(destination)){if(!validFile(destination,expected)){if(!validFile(source,expected))throw new Error(`OCR source model invalid for ${language}`);fs.copyFileSync(source,destination);if(!validFile(destination,expected))throw new Error(`OCR model integrity verification failed for ${language}`);}verifiedOcrModels.add(destination);}
   }
   const worker=await createWorker(['eng','tur'],1,{langPath:languageDirectory,cachePath:languageDirectory,gzip:true});
   try{let image=nativeImage.createFromPath(file);const size=image.getSize(),scale=Math.min(1,2400/Math.max(size.width,size.height));if(scale<1)image=image.resize({width:Math.round(size.width*scale),height:Math.round(size.height*scale)});const result=await worker.recognize(image.toPNG());if(!store.data.items.includes(item)||(item.renderedFile||item.imageFile)!==fingerprint)throw new Error('Image changed during recognition');item.ocrText=String(result.data.text||'').slice(0,1024*1024);store.persist();if(!quiet)notify(item.ocrText?'Image text ready':'No text found');else broadcast();return{text:item.ocrText,id};}
