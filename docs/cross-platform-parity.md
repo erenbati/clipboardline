@@ -69,6 +69,8 @@ Trash, as the copy shortcut already works there, while editing actions wait for
 Restore.
 `item-name-trimming` requires an item name to be used without surrounding
 whitespace and a whitespace-only name to count as no name.
+`folder-removal-view` requires removing a folder to return the Library to My
+library only when the open view is that folder or one of its subfolders.
 
 The adapters execute application behavior:
 
