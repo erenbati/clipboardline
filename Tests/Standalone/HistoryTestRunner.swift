@@ -526,6 +526,7 @@ enum HistoryTestRunner {
             ("testPinnedImageWhoseManagedCopyIsGoneCanStillLeaveTheShelfGoToTrashAndRestore", libraryStore.testPinnedImageWhoseManagedCopyIsGoneCanStillLeaveTheShelfGoToTrashAndRestore),
             ("testMovingFromParentRemovesChildMembershipButKeepsOtherFoldersAndOriginal", libraryStore.testMovingFromParentRemovesChildMembershipButKeepsOtherFoldersAndOriginal),
             ("testDomainFilterIncludesSubdomainsWithLiteralHostBoundaries", libraryStore.testDomainFilterIncludesSubdomainsWithLiteralHostBoundaries),
+            ("testBlankOrPaddedItemNameIsIgnoredOrTrimmedLikeWindows", libraryStore.testBlankOrPaddedItemNameIsIgnoredOrTrimmedLikeWindows),
             ("testTagRenameSearchTurkishAndLiteralSQLCharacters", libraryStore.testTagRenameSearchTurkishAndLiteralSQLCharacters),
             ("testTrashRestoresContentAndRelationshipsWithoutMovingOriginal", libraryStore.testTrashRestoresContentAndRelationshipsWithoutMovingOriginal),
             ("testAdaptersShareStableIdentityTextEditsFavoritesAndRestart", libraryStore.testAdaptersShareStableIdentityTextEditsFavoritesAndRestart),

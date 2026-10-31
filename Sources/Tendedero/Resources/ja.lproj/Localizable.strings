@@ -529,3 +529,9 @@
 "Focus previous pane" = "前のペインにフォーカス";
 
 "Undo Move to Trash" = "ゴミ箱への移動を取り消す";
+
+/* Image markup errors. */
+"The image markup document is invalid." = "画像マークアップのドキュメントが無効です。";
+"This image could not be opened for markup." = "この画像をマークアップ用に開けませんでした。";
+"Markup supports images up to 80 megapixels." = "マークアップは最大8,000万画素の画像に対応しています。";
+"The marked image could not be rendered." = "マークアップした画像をレンダリングできませんでした。";
