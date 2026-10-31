@@ -4,7 +4,7 @@
 "%d items copied" = "%d items copied";
 "%d selected" = "%d seleccionadas";
 "A free filename could not be found" = "A free filename could not be found";
-"About" = "About";
+"About" = "Acerca de";
 "Add Folder…" = "Añadir carpeta…";
 "Add tag…" = "Add tag…";
 "Add to folder" = "Add to folder";
@@ -18,7 +18,7 @@
 "Both shelves" = "Ambos estantes";
 "Bring the line down" = "Bajar la cuerda";
 "Cancel" = "Cancelar";
-"Capture copied links" = "Capture copied links";
+"Capture copied links" = "Guardar enlaces copiados";
 "Change Shortcut" = "Cambiar atajo";
 "Change Shortcut…" = "Cambiar atajo…";
 "Changes could not be saved; keep this draft open" = "Changes could not be saved; keep this draft open";
@@ -29,7 +29,7 @@
 "Clipboard" = "Clipboard";
 "Close" = "Close";
 "Close preview" = "Cerrar vista previa";
-"Colors" = "Colors";
+"Colors" = "Colores";
 "Contacts the linked website or YouTube in the background. Private markers, local addresses and links with known secret parameters are skipped." = "Contacts the linked website or YouTube in the background. Private markers, local addresses and links with known secret parameters are skipped.";
 "Content type" = "Content type";
 "Copied" = "Copiado";
@@ -55,7 +55,7 @@
 "Favorite an item, or add a folder or tag to keep it here." = "Pin an item, or add a folder or tag to keep it here.";
 "Favorites" = "Fijados";
 "Favorites, folders and tags keep items permanently. Other copies follow your history setting." = "Pinned items, folders and tags stay permanently. Other copies follow their history limits.";
-"Fetch link titles and thumbnails" = "Fetch link titles and thumbnails";
+"Fetch link titles and thumbnails" = "Obtener títulos y miniaturas de los enlaces";
 "File could not be read or safely saved" = "File could not be read or safely saved";
 "Filtered view" = "Filtered view";
 "Filters" = "Filters";
@@ -66,7 +66,7 @@
 "Hang copied images" = "Colgar imágenes copiadas";
 "Hang copied text" = "Colgar texto copiado";
 "Hide line" = "Ocultar tendedero";
-"History" = "History";
+"History" = "Historial";
 "Image" = "Image";
 "Image preview" = "Vista previa de imagen";
 "Image, text and link shelves, with a private local library." = "Image, text and link shelves, with a private local library.";
@@ -88,7 +88,7 @@
 "Link preview" = "Link preview";
 "Link preview could not be saved; the link is kept" = "Link preview could not be saved; the link is kept";
 "Link previews" = "Link previews";
-"Links" = "Links";
+"Links" = "Enlaces";
 "Loading" = "Loading";
 "Loading…" = "Loading…";
 "Markup" = "Marcación";
@@ -102,7 +102,7 @@
 "Move to Trash…" = "Enviar a la Papelera…";
 "Move to folder" = "Move to folder";
 "My library" = "My library";
-"Neutral glass" = "Neutral glass";
+"Neutral glass" = "Cristal neutro";
 "New folder" = "New folder";
 "New images saved to this folder will hang on the line." = "Las imágenes nuevas que se guarden en esta carpeta se colgarán en la cuerda.";
 "New note" = "New note";
@@ -158,7 +158,7 @@
 "Select an item to view its details" = "Select an item to view its details";
 "Selected files could not be read; nothing was copied" = "Selected files could not be read; nothing was copied";
 "Set copy-latest shortcut" = "Configurar atajo de copia reciente";
-"Settings" = "Settings";
+"Settings" = "Ajustes";
 "Settings…" = "Settings…";
 "Shelf settings" = "Ajustes del estante";
 "Shortcut" = "Atajo";
@@ -169,12 +169,12 @@
 "Show or hide the line" = "Show or hide the line";
 "Size" = "Tamaño";
 "Small" = "Pequeño";
-"Soft colors" = "Soft colors";
+"Soft colors" = "Colores suaves";
 "Some app copies could not be moved to Trash" = "Algunas copias de la app no pudieron enviarse a la Papelera";
 "Some text copies could not be moved to Trash" = "Algunas copias de texto no pudieron enviarse a la Papelera";
 "Sort" = "Sort";
 "Sounds" = "Sonidos";
-"Sources" = "Sources";
+"Sources" = "Fuentes";
 "Space" = "Espacio";
 "Stop Watching" = "Dejar de vigilar";
 "Switch shelf" = "Cambiar estante";
@@ -251,7 +251,7 @@
 "Library actions" = "Library actions";
 
 /* Language, status and local image search. */
-"Language" = "Language";
+"Language" = "Idioma";
 "System default" = "System default";
 "Reopen to apply language" = "Reopen to apply language";
 "Open edits are saved before the app reopens." = "Open edits are saved before the app reopens.";

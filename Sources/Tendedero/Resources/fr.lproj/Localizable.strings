@@ -4,7 +4,7 @@
 "%d items copied" = "%d items copied";
 "%d selected" = "%d selected";
 "A free filename could not be found" = "A free filename could not be found";
-"About" = "About";
+"About" = "À propos";
 "Add Folder…" = "Ajouter un dossier…";
 "Add tag…" = "Add tag…";
 "Add to folder" = "Add to folder";
@@ -18,7 +18,7 @@
 "Both shelves" = "Both shelves";
 "Bring the line down" = "Faire descendre la corde";
 "Cancel" = "Cancel";
-"Capture copied links" = "Capture copied links";
+"Capture copied links" = "Enregistrer les liens copiés";
 "Change Shortcut" = "Modifier le raccourci";
 "Change Shortcut…" = "Modifier le raccourci…";
 "Changes could not be saved; keep this draft open" = "Changes could not be saved; keep this draft open";
@@ -29,7 +29,7 @@
 "Clipboard" = "Clipboard";
 "Close" = "Close";
 "Close preview" = "Close preview";
-"Colors" = "Colors";
+"Colors" = "Couleurs";
 "Contacts the linked website or YouTube in the background. Private markers, local addresses and links with known secret parameters are skipped." = "Contacts the linked website or YouTube in the background. Private markers, local addresses and links with known secret parameters are skipped.";
 "Content type" = "Content type";
 "Copied" = "Copié";
@@ -55,25 +55,25 @@
 "Favorite an item, or add a folder or tag to keep it here." = "Pin an item, or add a folder or tag to keep it here.";
 "Favorites" = "Épinglés";
 "Favorites, folders and tags keep items permanently. Other copies follow your history setting." = "Pinned items, folders and tags stay permanently. Other copies follow their history limits.";
-"Fetch link titles and thumbnails" = "Fetch link titles and thumbnails";
+"Fetch link titles and thumbnails" = "Récupérer les titres et miniatures des liens";
 "File could not be read or safely saved" = "File could not be read or safely saved";
 "Filtered view" = "Filtered view";
 "Filters" = "Filters";
 "Folder" = "Folder";
 "Folders" = "Folders";
-"General" = "General";
+"General" = "Général";
 "Handle screenshots" = "Gérer les captures d’écran";
 "Hang copied images" = "Accrocher les images copiées";
 "Hang copied text" = "Hang copied text";
 "Hide line" = "Masquer la corde";
-"History" = "History";
+"History" = "Historique";
 "Image" = "Image";
 "Image preview" = "Image preview";
 "Image, text and link shelves, with a private local library." = "Image, text and link shelves, with a private local library.";
 "Images" = "Images";
 "Its contents stay in your library." = "Its contents stay in your library.";
 "Keep for %d days" = "Keep for %d days";
-"Keyboard shortcuts" = "Keyboard shortcuts";
+"Keyboard shortcuts" = "Raccourcis clavier";
 "Large" = "Grande";
 "Last 30 days" = "Last 30 days";
 "Last 7 days" = "Last 7 days";
@@ -88,7 +88,7 @@
 "Link preview" = "Link preview";
 "Link preview could not be saved; the link is kept" = "Link preview could not be saved; the link is kept";
 "Link previews" = "Link previews";
-"Links" = "Links";
+"Links" = "Liens";
 "Loading" = "Loading";
 "Loading…" = "Loading…";
 "Markup" = "Annotation";
@@ -102,7 +102,7 @@
 "Move to Trash…" = "Move to Trash…";
 "Move to folder" = "Move to folder";
 "My library" = "My library";
-"Neutral glass" = "Neutral glass";
+"Neutral glass" = "Verre neutre";
 "New folder" = "New folder";
 "New images saved to this folder will hang on the line." = "Les nouvelles images enregistrées dans ce dossier s’accrocheront à la corde.";
 "New note" = "New note";
@@ -158,7 +158,7 @@
 "Select an item to view its details" = "Select an item to view its details";
 "Selected files could not be read; nothing was copied" = "Selected files could not be read; nothing was copied";
 "Set copy-latest shortcut" = "Set copy-latest shortcut";
-"Settings" = "Settings";
+"Settings" = "Réglages";
 "Settings…" = "Settings…";
 "Shelf settings" = "Shelf settings";
 "Shortcut" = "Raccourci";
@@ -169,7 +169,7 @@
 "Show or hide the line" = "Show or hide the line";
 "Size" = "Taille";
 "Small" = "Petite";
-"Soft colors" = "Soft colors";
+"Soft colors" = "Couleurs douces";
 "Some app copies could not be moved to Trash" = "Some app copies could not be moved to Trash";
 "Some text copies could not be moved to Trash" = "Some text copies could not be moved to Trash";
 "Sort" = "Sort";
@@ -191,7 +191,7 @@
 "Text archive is full; new text was not saved" = "Text archive is full; new text was not saved";
 "Text copied" = "Text copied";
 "Text preview" = "Text preview";
-"Texts" = "Texts";
+"Texts" = "Textes";
 "Texts appear here after you enable Hang copied text" = "Texts appear here after you enable Hang copied text";
 "This selection is too large to copy; select fewer items" = "This selection is too large to copy; select fewer items";
 "Title" = "Title";
@@ -251,7 +251,7 @@
 "Library actions" = "Library actions";
 
 /* Language, status and local image search. */
-"Language" = "Language";
+"Language" = "Langue";
 "System default" = "System default";
 "Reopen to apply language" = "Reopen to apply language";
 "Open edits are saved before the app reopens." = "Open edits are saved before the app reopens.";
@@ -503,7 +503,7 @@
 "Open Device Control and Data Access" = "Ouvrir Device Control and Data Access";
 "Last checked" = "Dernière vérification";
 
-"Updates" = "Updates";
+"Updates" = "Mises à jour";
 
 "Update…" = "Update…";
 

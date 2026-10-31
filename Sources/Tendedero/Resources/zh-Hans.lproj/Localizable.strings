@@ -4,7 +4,7 @@
 "%d items copied" = "%d items copied";
 "%d selected" = "已选择 %d 项";
 "A free filename could not be found" = "A free filename could not be found";
-"About" = "About";
+"About" = "关于";
 "Add Folder…" = "添加文件夹…";
 "Add tag…" = "Add tag…";
 "Add to folder" = "Add to folder";
@@ -18,7 +18,7 @@
 "Both shelves" = "两个挂架";
 "Bring the line down" = "放下晾衣绳";
 "Cancel" = "取消";
-"Capture copied links" = "Capture copied links";
+"Capture copied links" = "保存复制的链接";
 "Change Shortcut" = "更改快捷键";
 "Change Shortcut…" = "更改快捷键…";
 "Changes could not be saved; keep this draft open" = "Changes could not be saved; keep this draft open";
@@ -29,7 +29,7 @@
 "Clipboard" = "Clipboard";
 "Close" = "Close";
 "Close preview" = "关闭预览";
-"Colors" = "Colors";
+"Colors" = "颜色";
 "Contacts the linked website or YouTube in the background. Private markers, local addresses and links with known secret parameters are skipped." = "Contacts the linked website or YouTube in the background. Private markers, local addresses and links with known secret parameters are skipped.";
 "Content type" = "Content type";
 "Copied" = "已复制";
@@ -55,18 +55,18 @@
 "Favorite an item, or add a folder or tag to keep it here." = "Pin an item, or add a folder or tag to keep it here.";
 "Favorites" = "已固定";
 "Favorites, folders and tags keep items permanently. Other copies follow your history setting." = "Pinned items, folders and tags stay permanently. Other copies follow their history limits.";
-"Fetch link titles and thumbnails" = "Fetch link titles and thumbnails";
+"Fetch link titles and thumbnails" = "获取链接标题和缩略图";
 "File could not be read or safely saved" = "File could not be read or safely saved";
 "Filtered view" = "Filtered view";
 "Filters" = "Filters";
 "Folder" = "Folder";
 "Folders" = "Folders";
-"General" = "General";
+"General" = "常规";
 "Handle screenshots" = "接管截图";
 "Hang copied images" = "挂上复制的图片";
 "Hang copied text" = "挂起复制的文本";
 "Hide line" = "隐藏晾衣绳";
-"History" = "History";
+"History" = "历史记录";
 "Image" = "Image";
 "Image preview" = "图像预览";
 "Image, text and link shelves, with a private local library." = "Image, text and link shelves, with a private local library.";
@@ -88,7 +88,7 @@
 "Link preview" = "Link preview";
 "Link preview could not be saved; the link is kept" = "Link preview could not be saved; the link is kept";
 "Link previews" = "Link previews";
-"Links" = "Links";
+"Links" = "链接";
 "Loading" = "Loading";
 "Loading…" = "Loading…";
 "Markup" = "标记";
@@ -102,7 +102,7 @@
 "Move to Trash…" = "移至废纸篓…";
 "Move to folder" = "Move to folder";
 "My library" = "My library";
-"Neutral glass" = "Neutral glass";
+"Neutral glass" = "中性玻璃";
 "New folder" = "New folder";
 "New images saved to this folder will hang on the line." = "保存到此文件夹的新图片会挂到晾衣绳上。";
 "New note" = "New note";
@@ -158,7 +158,7 @@
 "Select an item to view its details" = "Select an item to view its details";
 "Selected files could not be read; nothing was copied" = "Selected files could not be read; nothing was copied";
 "Set copy-latest shortcut" = "设置复制最新图像的快捷键";
-"Settings" = "Settings";
+"Settings" = "设置";
 "Settings…" = "Settings…";
 "Shelf settings" = "挂架设置";
 "Shortcut" = "快捷键";
@@ -169,12 +169,12 @@
 "Show or hide the line" = "Show or hide the line";
 "Size" = "大小";
 "Small" = "小";
-"Soft colors" = "Soft colors";
+"Soft colors" = "柔和色彩";
 "Some app copies could not be moved to Trash" = "部分应用副本无法移至废纸篓";
 "Some text copies could not be moved to Trash" = "部分文本副本无法移至废纸篓";
 "Sort" = "Sort";
 "Sounds" = "声音";
-"Sources" = "Sources";
+"Sources" = "来源";
 "Space" = "空格";
 "Stop Watching" = "停止监视";
 "Switch shelf" = "切换挂架";
@@ -251,7 +251,7 @@
 "Library actions" = "Library actions";
 
 /* Language, status and local image search. */
-"Language" = "Language";
+"Language" = "语言";
 "System default" = "System default";
 "Reopen to apply language" = "Reopen to apply language";
 "Open edits are saved before the app reopens." = "Open edits are saved before the app reopens.";
