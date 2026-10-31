@@ -42,6 +42,12 @@
         "windows": "The renderer formats the count with the shared \"%d selected\" catalog entry (selectedLabel); renderer-ui.test.cjs checks the footer and the details panel in Turkish, Spanish, Simplified Chinese and English. The Windows folder picker also shows its count with this entry and is checked by the same test."
       },
       {
+        "id": "width-insensitive-search",
+        "behavior": "Shelf and Library text search ignore accents and character width, so full-width Latin (ＡＢＣ) and half-width katakana (ﾃｽﾄ) are found by typing abc or テスト, with a locale-independent lower case for Turkish I.",
+        "macos": "Search compares libraryFolded strings: folding with .diacriticInsensitive and .widthInsensitive, then lowercased (LibraryStore.swift).",
+        "windows": "The renderer fold applies compatibility mapping only to the ideographic space and the Halfwidth and Fullwidth Forms block (plus Hangul compatibility jamo, so half-width ﾡ matches ㄱ, and ￣ mapped to ¯ as on the Mac), strips combining accents and lower-cases without a locale, so ligatures and circled digits stay distinct as on the Mac; shelf-render.test.cjs checks both through the shipped renderer."
+      },
+      {
         "id": "link-title-charset",
         "behavior": "A fetched page title and Open Graph text are decoded with the page's declared character set, in this order: UTF-8 byte-order mark, Content-Type charset, XML declaration (XHTML only), early meta charset; unknown labels are skipped, a meta UTF-16 label means UTF-8, and undeclared bytes that are not UTF-8 are windows-1252, so older windows-1254 / ISO-8859-9 pages show their Turkish letters.",
         "macos": "PublicLinkHTMLMetadata.decode follows that order with CoreFoundation IANA names; PublicLinkNetworkTests.testHTMLHonorsDeclaredMetaCharsetAndFallsBackToWindows1252 covers it.",
