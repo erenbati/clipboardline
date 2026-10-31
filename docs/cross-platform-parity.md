@@ -52,6 +52,14 @@ details panel to show the count with the localized `%d selected` entry. The
 Windows folder picker uses the same entry; the macOS folder picker keeps its own
 `Pin %d items to a folder` heading.
 
+Shortcut recorder focus return is described in the shared `contracts/shortcut-recording.json` exception.
+On Windows the recorder lives in the Settings DOM and must refocus a newly rendered
+Record button by stable identity, not an already detached element. On macOS the
+recorder is a separate nonactivating NSPanel: closing it ends native key-window
+capture and lets AppKit choose the returning window and first responder. Mac
+focus may return to the containing native window instead of the exact Settings
+button; both platforms restore their owned global shortcut registrations.
+
 The adapters execute application behavior:
 
 - macOS: `CrossPlatformBehaviorContractTests` creates the actual `LibraryStore`,

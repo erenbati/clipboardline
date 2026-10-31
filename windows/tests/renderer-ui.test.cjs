@@ -716,6 +716,11 @@ test('IME composing Enter Escape and arrows stay native in Library search, text 
 });
 
 test('closing a Settings shortcut recorder restores focus to its opening control',async()=>{
+ const contract=JSON.parse(fs.readFileSync(path.join(__dirname,'../../contracts/shortcut-recording.json'),'utf8'));
+ const policy=contract.nativeExceptions?.find(entry=>entry.id==='shortcut-recorder-return-focus');
+ assert.ok(policy,'The cross-platform shortcut recorder contract must document native focus return');
+ assert.match(policy.windows,/Record button/);
+ assert.match(policy.macos,/NSPanel/);
  const f=fixture({trackFocus:true});await f.ready();await f.api.command('settings');await f.ready();await f.click('settings-tab',{tab:'shortcuts'});await f.click('record-local',{keyAction:'pin'});assert.match(f.main,/id="settings-record-local-pin"/);
  const trigger=f.lastClick;assert.ok(f.focused?.insideOverlay);assert.notEqual(f.focused,trigger);
  await f.key('Escape');assert.equal(f.overlay,'');assert.equal(f.focused?.id,trigger.id);assert.notEqual(f.focused,trigger);assert.equal(f.focused?.isConnected,true);
