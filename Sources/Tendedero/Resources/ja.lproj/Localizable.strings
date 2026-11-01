@@ -507,7 +507,7 @@
 
 "Update…" = "アップデート…";
 
-"Checks at launch and every hour. You choose when to download and install." = "起動時および1時間ごとに確認します。ダウンロードとインストールは任意です。";
+"Checks at launch and every hour. You choose when to download and install." = "起動時と1時間ごとに確認します。ダウンロードとインストールのタイミングは自分で選べます。";
 
 "Signed updates · No account or token needed" = "署名済みアップデート · アカウントやトークンは不要";
 

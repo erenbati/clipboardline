@@ -325,7 +325,7 @@ function configureShortcuts(previousPreferences=null) {
   if(rejected.length){
     if(previousPreferences)store.modify('setSettings',{patch:{shortcuts:Object.fromEntries(rejected.map(value=>[value.action,previousPreferences[value.action]||'']))}});
     const unrestored=rejected.filter(value=>value.restorationFailed).map(value=>value.action);
-    message=`Shortcuts ${rejected.map(value=>value.shortcut).join(', ')} are unavailable. `+(unrestored.length?'Could not restore: '+unrestored.join(', ')+'.':rejected.some(value=>value.previous)?'Working previous shortcuts are kept.':'Choose another combination in Settings.');
+    message=(rejected.length===1?`Shortcut ${rejected[0].shortcut} is unavailable. `:`Shortcuts ${rejected.map(value=>value.shortcut).join(', ')} are unavailable. `)+(unrestored.length?'Could not restore: '+unrestored.join(', ')+'.':rejected.some(value=>value.previous)?'Working previous shortcuts are kept.':'Choose another combination in Settings.');
   }
   return rejected;
 }
@@ -373,7 +373,7 @@ async function command(action,payload={}) {
   }
   else if(action==='capture')result=await capture();
   else if(action==='newNote'){const item=store.insert('text',payload.text||'New note');if(payload.title)store.modify('details',{id:item.id,name:payload.title});store.modify('retain',{ids:[item.id]});result={id:item.id};}
-  else if(action==='import'){const response=await dialog.showOpenDialog(window,{properties:['openFile','multiSelections'],filters:[{name:mainText('Images, recordings and text'),extensions:['png','jpg','jpeg','webp','bmp','mov','mp4','txt','md']}]});const imported=[],failures=[];for(const file of response.filePaths){try{const item=await importFile(file);imported.push(item.id);if(item.kind==='link')void enrich(item.id);}catch(error){failures.push({filename:path.basename(file),error:error.message});}}result={ids:imported,failed:failures.length};if(failures.length){const failure=failures[0],localizedError=mainText(failure.error);message=imported.length?mainText('Imported %d · failed %d. %@: %@',imported.length,failures.length,failure.filename,localizedError):`${failure.filename}: ${localizedError}`;}}
+  else if(action==='import'){const response=await dialog.showOpenDialog(window,{properties:['openFile','multiSelections'],filters:[{name:mainText('Images, recordings and text'),extensions:['png','jpg','jpeg','webp','bmp','mov','mp4','txt','md']}]});const imported=[],failures=[];for(const file of response.filePaths){try{const item=await importFile(file);imported.push(item.id);if(item.kind==='link')void enrich(item.id);}catch(error){failures.push({filename:path.basename(file),error:error.message});}}result={ids:imported,failed:failures.length};if(failures.length){const [first,...others]=failures;const localizedError=mainText(first.error);const summary=imported.length?mainText('Imported %d · failed %d. %@: %@',imported.length,failures.length,first.filename,localizedError):`${first.filename}: ${localizedError}`;message=[summary,...others.map(failure=>`${failure.filename}: ${mainText(failure.error)}`)].join('; ');}}
   else if(action==='searchImages'){if(!imageSearch)throw new Error('Offline image search is unavailable.');result=await imageSearch.search(payload.query,payload.eligibleIds);}
   else if(action==='ocr')result=await ocr(payload.id);
   else if(action==='copyOCR'){const recognized=await ocr(payload.id);if(!recognized.text.trim())throw new Error('No text found in this image.');await writeClipboard([{kind:'text',text:recognized.text}]);result=recognized;notify('Recognized text copied');}
